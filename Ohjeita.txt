@@ -1,0 +1,3 @@
+React appin luominen CMDssä
+
+npx create-react-app [project name]
