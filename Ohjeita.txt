@@ -1,3 +1,17 @@
 React appin luominen CMDssä
 
 npx create-react-app [project name]
+
+
+//Objectin propertyjen arvot funktioina:
+
+const operaatiot=
+{
+'+': ((a,b)=>a+b),
+'-': ((a,b)=>a+b),
+'*': ((a,b)=>a+b),
+'/': ((a,b)=>a+b),
+}
+
+//Käyttö
+tulos = operaatiot[operaattori](arvo1, arvo2))

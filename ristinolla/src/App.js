@@ -32,11 +32,11 @@ const voittoArray8 = [2, 4, 6]
 
 const voittoArrays = [voittoArray1, voittoArray2, voittoArray3, voittoArray4, voittoArray5, voittoArray6, voittoArray7, voittoArray8]
 
-var PeliKäynnissä = true
+let PeliKäynnissä = true
 
 function App() {
 
-
+ 
   //Risti = 1, Nolla = 2
   const [ristikko, setRistikko] = useState(new Array(0, 0, 0, 0, 0, 0, 0, 0, 0));
   const [nollanVuoro, setVuoro] = useState(true)
@@ -44,22 +44,20 @@ function App() {
   const [tietokoneOnRandom, setKoneRandom] = useState(true)
   const [nollaAloittaa, setAloittaja] = useState(true)
 
+ 
   useEffect(() => {
 
     if (tietokoneVastustaja) {
       if (!nollanVuoro) {
         if (tietokoneOnRandom) {
-          setRistinolla(haeRandom(ristikko))
+          asetaRistinolla(haeRandom(ristikko))
         }
         else {
-          setRistinolla(haeÄlykäsPeli(ristikko, voittoArrays))
+          asetaRistinolla(haeÄlykäsPeli(ristikko, voittoArrays))
         }
       }
     }
-
   })
-
-
 
   const getSymbol = (paikka) => {
     if (ristikko[paikka] === 1) {
@@ -72,7 +70,7 @@ function App() {
     return ""
   }
 
-  const setRistinolla = (event) => {
+  const asetaRistinolla = (event) => {
 
     if (!PeliKäynnissä) {
       return
@@ -84,7 +82,7 @@ function App() {
       return
     }
 
-    let päivitettyRistikko = ristikko
+    let päivitettyRistikko = [].concat(ristikko)
     päivitettyRistikko[paikka] = getVuoro()
     setVuoro(!nollanVuoro)
     setRistikko(päivitettyRistikko)
@@ -131,7 +129,7 @@ function App() {
     return 0
   }
 
-  const HaeVuoroTaiVoittaja = () => {
+  const haeVuoroTaiVoittaja = () => {
 
     switch (tarkistaVoitto()) {
       case 0:
@@ -151,7 +149,7 @@ function App() {
     }
   }
 
-  const HaeVuoronVäri = () => {
+  const haeVuoronVäri = () => {
     if (!PeliKäynnissä) {
       return "black"
     }
@@ -209,26 +207,14 @@ function App() {
       </div>
       <div style={peliContainer}>
 
-        <Grid>
-          <Grid container direction="row" justify="flex-end">
-            <Ruutu backgroundColor="#dfe1e5" onClick={setRistinolla} value={0} symbol={getSymbol(0)} />
-            <Ruutu backgroundColor="#dfe1e5" onClick={setRistinolla} value={1} symbol={getSymbol(1)} />
-            <Ruutu backgroundColor="#dfe1e5" onClick={setRistinolla} value={2} symbol={getSymbol(2)} />
-          </Grid>
-          <Grid container direction="row" justify="flex-end">
-            <Ruutu backgroundColor="#dfe1e5" onClick={setRistinolla} value={3} symbol={getSymbol(3)} />
-            <Ruutu backgroundColor="#dfe1e5" onClick={setRistinolla} value={4} symbol={getSymbol(4)} />
-            <Ruutu backgroundColor="#dfe1e5" onClick={setRistinolla} value={5} symbol={getSymbol(5)} />
-          </Grid>
-          <Grid container direction="row" justify="flex-end">
-            <Ruutu backgroundColor="#dfe1e5" onClick={setRistinolla} value={6} symbol={getSymbol(6)} />
-            <Ruutu backgroundColor="#dfe1e5" onClick={setRistinolla} value={7} symbol={getSymbol(7)} />
-            <Ruutu backgroundColor="#dfe1e5" onClick={setRistinolla} value={8} symbol={getSymbol(8)} />
-          </Grid>
+        <Grid container direction="row" style={{width: 309}}>
+
+          {ristikko.map((ruutu, i) => <Ruutu onClick={asetaRistinolla} key={i} value={i} symbol={getSymbol(i)}/>)}
+   
         </Grid>
       </div>
 
-      <h1 style={{ color: HaeVuoronVäri() }}>{HaeVuoroTaiVoittaja()}</h1>
+      <h1 style={{ color: haeVuoronVäri() }}>{haeVuoroTaiVoittaja()}</h1>
     </div>
   );
 }

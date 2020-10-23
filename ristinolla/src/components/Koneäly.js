@@ -9,6 +9,9 @@ const haeRandom = (ristikko) => {
 
     let mahdollisetRuudut = new Array()
 
+
+    //Katso Array.filter
+
     for (let i = 0; i < ristikko.length; i++) {
         if (ristikko[i] === 0) {
             mahdollisetRuudut.push(i)
@@ -49,7 +52,7 @@ const haeÄlykäsPeli = (ristikko, voittoArrays) => {
     }
 
     //Jos voit voittaa -> Voita
-    //Jos vihollinen voi voittaa -> Estä
+    //Jos vastustaja voi voittaa -> Estä
 
     let LisättäväRuutu = haeVoittotilanteet(ristikko, voittoArrays)
 
@@ -57,7 +60,7 @@ const haeÄlykäsPeli = (ristikko, voittoArrays) => {
         return LisättäväRuutu
     }
 
-    //Jos jos ympyröitä on keskellä ja X vastakkaisessa kulmassa -> laita johonkin kulmaan
+    //Jos ympyröitä on keskellä ja X vastakkaisessa kulmassa -> laita johonkin kulmaan
     if(xLaudalla === 1)
     {
         let kulmaRuutu = laskeKulma(ristikko)
