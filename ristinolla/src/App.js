@@ -16,7 +16,13 @@ const peliContainer =
   marginTop: 20,
   padding: 20,
   backgroundColor: "black"
+}
 
+const valikkoButtonStyle =
+{
+  width: 170,
+  fontSize: 20,
+  margin: 2
 }
 
 
@@ -36,15 +42,15 @@ let PeliKäynnissä = true
 
 function App() {
 
- 
+
   //Risti = 1, Nolla = 2
-  const [ristikko, setRistikko] = useState(new Array(0, 0, 0, 0, 0, 0, 0, 0, 0));
+  const [ristikko, setRistikko] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0]);
   const [nollanVuoro, setVuoro] = useState(true)
   const [tietokoneVastustaja, setTietokoneVastustaja] = useState(false)
-  const [tietokoneOnRandom, setKoneRandom] = useState(true)
-  const [nollaAloittaa, setAloittaja] = useState(true)
+  const [tietokoneOnRandom, setTietokoneOnRandom] = useState(true)
+  const [nollaAloittaa, setNollaAloittaa] = useState(true)
 
- 
+
   useEffect(() => {
 
     if (tietokoneVastustaja) {
@@ -146,6 +152,8 @@ function App() {
       case 3:
         PeliKäynnissä = false
         return "Tasapeli"
+      default:
+        return ""
     }
   }
 
@@ -163,8 +171,8 @@ function App() {
 
   const resetoiPeli = (Aloittaja) => {
 
-   
-    setRistikko(new Array(0, 0, 0, 0, 0, 0, 0, 0, 0));
+
+    setRistikko([0, 0, 0, 0, 0, 0, 0, 0, 0]);
     setVuoro(Aloittaja)
     PeliKäynnissä = true
   }
@@ -175,12 +183,12 @@ function App() {
   }
 
   const vaihdaKoneenTaso = () => {
-    setKoneRandom(!tietokoneOnRandom)
+    setTietokoneOnRandom(!tietokoneOnRandom)
   }
 
 
   const valitseAloittaja = () => {
-    setAloittaja(!nollaAloittaa)
+    setNollaAloittaa(!nollaAloittaa)
     resetoiPeli(!nollaAloittaa)
   }
 
@@ -191,26 +199,26 @@ function App() {
 
       <h1>Ristinolla</h1>
       <div style={{ flexDirection: 'row' }}>
-        <button style={{ width: 100, fontSize: 20, margin: 2 }} onClick={(e) => resetoiPeli(nollaAloittaa)}>Reset</button>
-        <button style={{ width: 150, fontSize: 20, margin: 2 }} onClick={valitseAloittaja}>{nollaAloittaa ? "Nolla Aloittaa" : "X Aloittaa"}</button>
+        <button style={valikkoButtonStyle} onClick={(e) => resetoiPeli(nollaAloittaa)}>Reset</button>
+        <button style={valikkoButtonStyle} onClick={valitseAloittaja}>{nollaAloittaa ? "Nolla Aloittaa" : "X Aloittaa"}</button>
       </div>
       <div style={{ flexDirection: 'row' }}>
 
-        <button style={{ width: 200, fontSize: 20, margin: 2 }}
+        <button style={valikkoButtonStyle}
           onClick={vaihdaKonevastus}>{tietokoneVastustaja ? "Konevastus" : "Ei konevastusta"} </button>
 
         {tietokoneVastustaja ?
-          <button style={{ width: 200, fontSize: 20, margin: 2 }} onClick={vaihdaKoneenTaso}>{tietokoneOnRandom ? "Kone Random" : "Kone Älykäs"}</button>
+          <button style={valikkoButtonStyle} onClick={vaihdaKoneenTaso}>{tietokoneOnRandom ? "Kone Random" : "Kone Älykäs"}</button>
           :
           []
         }
       </div>
       <div style={peliContainer}>
 
-        <Grid container direction="row" style={{width: 309}}>
+        <Grid container direction="row" style={{ width: 309 }}>
 
-          {ristikko.map((ruutu, i) => <Ruutu onClick={asetaRistinolla} key={i} value={i} symbol={getSymbol(i)}/>)}
-   
+          {ristikko.map((ruutu, i) => <Ruutu onClick={asetaRistinolla} key={i} value={i} symbol={getSymbol(i)} />)}
+
         </Grid>
       </div>
 

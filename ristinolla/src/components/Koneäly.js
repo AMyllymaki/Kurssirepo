@@ -7,17 +7,15 @@ const rand = (max) => {
 
 const haeRandom = (ristikko) => {
 
-    let mahdollisetRuudut = new Array()
 
+    let mahdollisetRuudut = []
 
-    //Katso Array.filter
-
+    //Filter ei toimi tässä tilanteessa, koska taulukkoon lisätään i eikä ristikon arvoja
     for (let i = 0; i < ristikko.length; i++) {
         if (ristikko[i] === 0) {
             mahdollisetRuudut.push(i)
         }
     }
-
 
     let randomKohta = rand(mahdollisetRuudut.length)
 
@@ -47,6 +45,8 @@ const haeÄlykäsPeli = (ristikko, voittoArrays) => {
                     return 6
                 case 3:
                     return 8
+                default:
+                    return 0
             }
         }
     }
@@ -61,42 +61,34 @@ const haeÄlykäsPeli = (ristikko, voittoArrays) => {
     }
 
     //Jos ympyröitä on keskellä ja X vastakkaisessa kulmassa -> laita johonkin kulmaan
-    if(xLaudalla === 1)
-    {
+    if (xLaudalla === 1) {
         let kulmaRuutu = laskeKulma(ristikko)
 
-        if(kulmaRuutu !== false)
-        {
+        if (kulmaRuutu !== false) {
             return kulmaRuutu
         }
     }
-    
+
     //Etsi paikka josta saa eniten voittomahdollisuuksia ensi vuorolle ja palauta niistä yksi
     return haeParasRuutu(ristikko, voittoArrays)
 }
 
 
-const laskeKulma = (ristikko) =>
-{
-    if(ristikko[4] === 2)
-    {   
-        if(ristikko[0] === 1 && ristikko[8] === 2)
-        {
+const laskeKulma = (ristikko) => {
+    if (ristikko[4] === 2) {
+        if (ristikko[0] === 1 && ristikko[8] === 2) {
             return 2
         }
 
-        if(ristikko[2] === 1 && ristikko[6] === 2)
-        {
+        if (ristikko[2] === 1 && ristikko[6] === 2) {
             return 0
         }
 
-        if(ristikko[6] === 1 && ristikko[2] === 2)
-        {
+        if (ristikko[6] === 1 && ristikko[2] === 2) {
             return 8
         }
 
-        if(ristikko[8] === 1 && ristikko[0] === 2)
-        {
+        if (ristikko[8] === 1 && ristikko[0] === 2) {
             return 6
         }
     }
@@ -166,9 +158,10 @@ const haeVoittotilanteet = (ristikko, voittoArrays) => {
 const haeParasRuutu = (ristikko, voittoArrays) => {
 
 
-    const tyhjätRuudut = new Array()
+    const tyhjätRuudut = []
     //Pisteen jokaisesta mahdollisuudesta voittaa ensi vuorolla lisäämällä nyt tyhjään ruutuun
-    const tyhjäRuutujenPisteet = new Array()
+    const tyhjäRuutujenPisteet = []
+
 
     for (let i = 0; i < ristikko.length; i++) {
         if (ristikko[i] === 0) {
@@ -185,43 +178,40 @@ const haeParasRuutu = (ristikko, voittoArrays) => {
 
                 let voittoRuutu = voittoArrays[j][k]
 
-         
+
                 if (ristikko[voittoRuutu] === 1 || voittoRuutu === tyhjätRuudut[i]) {
- 
-                  
-                    
+
+
+
 
                     pisteitäRistille++
                 }
 
-         
+
 
                 if (pisteitäRistille === 2) {
 
-                  tyhjäRuutujenPisteet[i] = tyhjäRuutujenPisteet[i] + 1
-                  break
+                    tyhjäRuutujenPisteet[i] = tyhjäRuutujenPisteet[i] + 1
+                    break
                 }
             }
         }
     }
 
 
-    let isoinNumero = Math.max.apply(Math,(tyhjäRuutujenPisteet))
+    let isoinNumero = Math.max.apply(Math, (tyhjäRuutujenPisteet))
 
 
 
-    let parhaimmatRuudut = new Array()
+    let parhaimmatRuudut = []
 
-    for(let i = 0; i < tyhjäRuutujenPisteet.length; i++)
-    {
-        if(tyhjäRuutujenPisteet[i] === isoinNumero)
-        {
+    for (let i = 0; i < tyhjäRuutujenPisteet.length; i++) {
+        if (tyhjäRuutujenPisteet[i] === isoinNumero) {
             parhaimmatRuudut.push(tyhjätRuudut[i])
         }
     }
-    
-    if(parhaimmatRuudut.length === 0)
-    {
+
+    if (parhaimmatRuudut.length === 0) {
         return 0
     }
 
