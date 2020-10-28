@@ -47,10 +47,10 @@ function ExerciseArrayExtended(props) {
     const getArrayObjectBorder = (i) => {
 
         if (props.testArraySelected[i] === true) {
-            return "2px solid #3f50b5"
+            return "3px solid green"
         }
         else {
-            return "2px solid black"
+            return "3px solid black"
         }
     }
 
