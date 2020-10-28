@@ -16,14 +16,14 @@ const tableContainerStyle =
     display: 'flex',
     justifyContent: 'space-evenly',
     alignItems: 'center',
-    width: 1000,
+    flex: 1,
     height: 300
 }
 
 function Exercise1Extended() {
 
     const [testArrays, setTestArrays] = useState([["Bob", "Mark", "John", "Tony", "Tim", "Matt", "Margaret", "Moe", "George"], [], []]);
-    const [testArraysSelected, setTestArraysSelected] = useState([[false, false, false, false, false], [], []])
+    const [testArraysSelected, setTestArraysSelected] = useState([[], [], []])
 
     const moveSelected = (arrayIndex) => {
 
@@ -31,11 +31,11 @@ function Exercise1Extended() {
         let tmpTestArraysSelected = [...testArraysSelected]
 
         //Loops through all arrays and moves selected objects to the selected array
-        tmpTestArrays.forEach((array, index) => {
+        tmpTestArraysSelected.forEach((array, index) => {
 
             //Does not add items that are already in the array
             if (index !== arrayIndex) {
-                tmpTestArraysSelected[index].forEach((selection, selectionIndex) => {
+                array.forEach((selection, selectionIndex) => {
                     if (selection === true) {
                         tmpTestArrays[arrayIndex].push(tmpTestArrays[index][selectionIndex])
                     }
@@ -43,28 +43,24 @@ function Exercise1Extended() {
             }
         })
 
-        for(let j = 0; j < tmpTestArraysSelected.length; j++)
-        {
-            for (let i = tmpTestArraysSelected[j].length - 1; i >= 0; i--) 
-            {
+        for (let j = 0; j < tmpTestArraysSelected.length; j++) {
+            for (let i = tmpTestArraysSelected[j].length - 1; i >= 0; i--) {
 
                 //Does not remove the selected items from the target array
-                if(j === arrayIndex)
-                {
+                if (j === arrayIndex) {
                     break
                 }
 
                 console.log(tmpTestArraysSelected[j][i])
 
-                if(tmpTestArraysSelected[j][i])
-                {
+                if (tmpTestArraysSelected[j][i]) {
                     tmpTestArraysSelected[j].splice(i, 1)
                     tmpTestArrays[j].splice(i, 1)
                 }
-              
+
             }
         }
-   
+
         setTestArrays(tmpTestArrays)
         setTestArraysSelected(tmpTestArraysSelected)
 
@@ -72,35 +68,12 @@ function Exercise1Extended() {
 
     const selectItem = (position, arrayNumber) => {
 
-
         let tmpArray = [...testArraysSelected]
-        let newTestArrays = [...testArrays]
 
         tmpArray[arrayNumber][position] = !tmpArray[arrayNumber][position]
 
-        setTestArrays(newTestArrays)
         setTestArraysSelected(tmpArray)
     }
-
-    const reformSelection = () => {
-
-        let tmpArraysSelected = testArraysSelected
-
-        testArrays.forEach((array, index) => {
-
-            let newSelectionArray = []
-
-            array.forEach(item => {
-                newSelectionArray.push(false)
-            })
-
-            tmpArraysSelected[index] = newSelectionArray
-        });
-
-
-        setTestArraysSelected(tmpArraysSelected)
-    }
-
 
     return (
         <div style={mainContainerStyle} >

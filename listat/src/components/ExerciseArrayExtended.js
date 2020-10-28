@@ -1,20 +1,28 @@
 import { useState, useEffect } from "react";
+import Button from '@material-ui/core/Button'
+import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
+import ArrowDropUpIcon from '@material-ui/icons/ArrowDropUp';
+import '../index.css'
 
-const componentContainerStyle=
+const componentContainerStyle =
 {
-    width: 150, 
-    minHeight: 400, 
-    display: 'flex', 
+    width: 150,
+    minHeight: 450,
+    display: 'flex',
     justifyContent: 'center',
-     padding: 50, 
-     border: "2px solid black" 
+    paddingLeft: 50,
+    paddingRight: 50,
+    paddingTop: 30,
+    paddingBottom: 30,
+    border: "2px solid black",
+    margin: 5,
 }
-const innerContainerStyle=
+const innerContainerStyle =
 {
-    display: 'flex', 
-    flex: 1, 
-    flexDirection: 'column', 
-    alignItems: 'center', 
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
     justifyContent: 'space-between'
 }
 
@@ -39,7 +47,7 @@ function ExerciseArrayExtended(props) {
     const getArrayObjectBorder = (i) => {
 
         if (props.testArraySelected[i] === true) {
-            return "2px solid blue"
+            return "2px solid #3f50b5"
         }
         else {
             return "2px solid black"
@@ -73,16 +81,15 @@ function ExerciseArrayExtended(props) {
         return filterArray(props.testArray)
     }
 
-    const getSortButtonText = () => {
-
+    const getSortIcon = () => {
         if (testArrayAscending === undefined) {
-            return "Sort"
+            return []
         }
         else if (testArrayAscending) {
-            return "Sort Asc"
+            return <ArrowDropUpIcon />
         }
         else {
-            return "Sort Desc"
+            return <ArrowDropDownIcon />
         }
     }
 
@@ -111,22 +118,29 @@ function ExerciseArrayExtended(props) {
 
         <div onClick={moveSelected} style={componentContainerStyle}>
 
-            {props.testArray.length === 0 ? "This list has no items" :
+            {props.testArray.length === 0 ?
+                <div style={{ display: 'flex', alignItems: 'center', }}>
+                    This list has no items
+            </div>
+                :
                 <div style={innerContainerStyle}>
 
-                    <button onClick={(e) => { e.stopPropagation(); sortArray() }}>{getSortButtonText()}</button>
+                    <div>
+                        <Button style={{ marginBottom: 15, width: 100 }} variant="contained" color="primary" onClick={(e) => { e.stopPropagation(); sortArray() }}> Sort
+                    {getSortIcon()}
+                        </Button>
+                    </div>
                     <div>
                         {getUsedArrayForDisplay().map((arrayObject, i) =>
-                            <div onClick={(e) => { e.stopPropagation(); selectArrayObject(i) }}
-                                style={{ border: getArrayObjectBorder(i), textAlign: 'center', width: 70, userSelect: 'none', padding: 5, margin: 2 }} key={i}>
+                            <div className={"nameobject"} onClick={(e) => { e.stopPropagation(); selectArrayObject(i) }}
+                                style={{ border: getArrayObjectBorder(i), textAlign: 'center', width: 100, userSelect: 'none', padding: 5, margin: 2 }} key={i}>
 
                                 {arrayObject}
                             </div>)}
                     </div>
-
-                    <div>
+                    <div style={{ marginTop: 15 }}>
                         Filter
-                        <input style={{ marginTop: 5 }} value={filterText} onClick={(e) => e.stopPropagation()} onChange={(e) => changeInput(e)}></input>
+                        <input style={{}} value={filterText} onClick={(e) => e.stopPropagation()} onChange={(e) => changeInput(e)}></input>
                     </div>
 
                 </div>
