@@ -50,7 +50,7 @@ export const laskeKeskiarvoFor = (viikkoTaulukko) => {
         if (pienin === undefined) {
           pienin = päivä.tunnit
         }
-        else if (pienin > päivä.tunnit) {
+        else if (parseFloat(pienin) > parseFloat(päivä.tunnit)) {
           pienin = päivä.tunnit
         }
       }
@@ -75,7 +75,7 @@ export const laskeKeskiarvoFor = (viikkoTaulukko) => {
         if (pienin === undefined) {
           pienin = päivä.tunnit
         }
-        else if (pienin < päivä.tunnit) {
+        else if (parseFloat(pienin) < parseFloat(päivä.tunnit)) {
           pienin = päivä.tunnit
         }
       }
