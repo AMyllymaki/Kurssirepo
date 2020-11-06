@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useReducer, createContext } from "react"
 import Button from '@material-ui/core/Button';
 import Kysymys from './components/Kysymys'
 import logo from './images/selmaSpin.gif'
-
+import Fade from 'react-reveal/Fade';
 
 const mainContainerStyle =
 {
@@ -24,7 +24,46 @@ const tableContainerStyle =
   width: 1184,
 }
 
+const UserContext = createContext(null)
 
+
+const luoVastaukset = () => {
+
+  let storedData = window.localStorage.getItem('data')
+
+
+  if (storedData !== null && storedData !== undefined && JSON.parse(storedData) !== null) {
+
+    return JSON.parse(storedData)
+  }
+  else {
+
+
+    let vastaukset = []
+
+    tentit.forEach(tentti => {
+
+      let tenttiID = tentti.id
+
+      tentti.kysymykset.forEach(kysymys => {
+
+        let vastaus =
+        {
+          tenttiID: tenttiID,
+          kysymysID: undefined,
+          vastaukset: [],
+        }
+
+        vastaus.kysymysID = kysymys.id
+        vastaus.vastaukset = new Array(kysymys.vastausVaihtoehdot.length).fill(false)
+
+        vastaukset.push(vastaus)
+      })
+    });
+
+    return vastaukset
+  }
+}
 
 const kysymysMatikka1 =
 {
@@ -138,107 +177,108 @@ const tentti2 =
   kysymykset: [kysymysMatikka1, kysymysMatikka2, kysymysMatikka3, kysymysMatikka4],
 }
 
-
-
 const tentit = [tentti1, tentti2]
 
 
 
 
-
-const luoVastaukset = () => {
-  let storedData = window.localStorage.getItem('data')
-
-  if (storedData !== null && JSON.parse(storedData) !== null) {
-
-    return JSON.parse(storedData)
-  }
-  else {
-
-    let vastaukset = []
-
-    tentit.forEach(tentti => {
-
-      let tenttiID = tentti.id
-
-      tentti.kysymykset.forEach(kysymys => {
-
-        let vastaus =
-        {
-          tenttiID: tenttiID,
-          kysymysID: undefined,
-          vastaukset: [],
-        }
-
-        vastaus.kysymysID = kysymys.id
-        vastaus.vastaukset = new Array(kysymys.vastausVaihtoehdot.length).fill(false)
-
-        vastaukset.push(vastaus)
-      })
-    });
-
-    return vastaukset
-  }
-}
-
 const nollaaVastaukset = () => {
   window.localStorage.clear()
 }
-
-
 
 const rand = (max) => {
   return Math.floor(Math.random() * Math.floor(max));
 }
 
+const initialState =
+{
+  näytäVastaukset: false,
+  valittuTentti: undefined,
+  vastaukset: luoVastaukset(),
+  loading: false,
+}
+
+const reducer = (state = initialState, action) => {
+
+  let newState = JSON.parse(JSON.stringify(state))
+
+  switch (action.type) {
+    case "NäytäVastaukset":
+      newState.näytäVastaukset = true
+      return newState
+    case "PiilotaVastaukset":
+      newState.näytäVastaukset = false
+      return newState
+    case "Lataa":
+      newState.loading = true
+      return newState
+    case "LopetaLataus":
+      newState.loading = false
+      return newState
+    case "MuutaValittuTentti":
+      newState.valittuTentti = action.payload
+      return newState
+    case "MuutaVastaukset":
+      newState.vastaukset = action.payload
+      return newState
+
+  }
+}
+
 function App() {
 
-  const [näytäVastaukset, setNäytäVastaukset] = useState(false)
-  const [valittuTentti, setValittuTentti] = useState(undefined)
-  const [vastaukset, setVastaus] = useState(luoVastaukset())
-  const [loading, setLoading] = useState(false)
+  const [state, dispatch] = useReducer(reducer, initialState)
 
   let lataus = undefined
 
   useEffect(() => {
 
-    window.localStorage.setItem('data', JSON.stringify(vastaukset))
+    window.localStorage.setItem('data', JSON.stringify(state.vastaukset))
 
-  }, [vastaukset]);
+  }, [state.vastaukset]);
 
   const valitseVastaus = (tenttiID, kysymysID, i) => {
 
-    let tmpVastaukset = [...vastaukset]
+    let tmpVastaukset = [...state.vastaukset]
     let vastaus = tmpVastaukset.find(vastaus => vastaus.tenttiID === tenttiID && vastaus.kysymysID === kysymysID)
 
     vastaus.vastaukset[i] = !vastaus.vastaukset[i]
 
-    setVastaus(tmpVastaukset)
+    dispatch({ type: "MuutaVastaukset", payload: tmpVastaukset })
   }
 
   const checkValittuTentti = () => {
-    if (valittuTentti === undefined) {
+
+    if (state.valittuTentti === undefined) {
       return undefined
     }
 
-    return valittuTentti.id
+    return state.valittuTentti.id
   }
 
   const haeVastaus = (tenttiID, kysymysID) => {
 
-    let palautettavaVastaus = vastaukset.find(vastaus => vastaus.tenttiID === tenttiID && vastaus.kysymysID === kysymysID)
+    let palautettavaVastaus = state.vastaukset.find(vastaus => vastaus.tenttiID === tenttiID && vastaus.kysymysID === kysymysID)
 
     return palautettavaVastaus
   }
 
   const muutaNäytävastaukset = () => {
-    setNäytäVastaukset(!näytäVastaukset)
+
+    if (state.näytäVastaukset) {
+
+      dispatch({ type: "PiilotaVastaukset" })
+    }
+    else {
+      dispatch({ type: "NäytäVastaukset" })
+    }
+
   }
 
   const valitseTentti = (tentti) => {
     lataa()
-    muutaNäytävastaukset()
-    setValittuTentti(tentti)
+    dispatch({ type: "PiilotaVastaukset" })
+    dispatch({ type: "MuutaValittuTentti", payload: tentti })
   }
 
   const lataa = () => {
@@ -246,60 +286,66 @@ function App() {
       clearTimeout(lataus)
     }
 
-    setLoading(true)
+    dispatch({ type: "Lataa" })
 
     lataus = setTimeout(() => {
 
-      setLoading(false)
+      dispatch({ type: "LopetaLataus" })
 
     }, 1000 * rand(5));
   }
 
+
+
   return (
-    <div >
 
-      <div style={{ backgroundColor: '#3F51B5' }}>
-        <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
-          <Button onClick={nollaaVastaukset} style={{ color: 'white' }}>Tentit</Button>
-          <Button onClick={nollaaVastaukset} style={{ color: 'white' }}>Tietoa Sovelluksesta</Button>
-
-        </div>
-      </div>
-
-      <div style={mainContainerStyle}>
-        <div style={tableContainerStyle}>
-          <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
-            {tentit.map((tentti, i) => <Button key={i} color="primary" variant={tentti.id === checkValittuTentti() ? "outlined" : ""} onClick={() => valitseTentti(tentti)} >{tentti.nimi}</Button>)}
+      <UserContext.Provider value={{ state, dispatch }}>
+        <div style={{ backgroundColor: '#3F51B5' }}>
+          <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
+            <Button onClick={nollaaVastaukset} style={{ color: 'white' }}>Tentit</Button>
+            <Button onClick={nollaaVastaukset} style={{ color: 'white' }}>Tietoa Sovelluksesta</Button>
           </div>
-
-
-          {loading ?
-            <div style={{ width: '100%' }}>
-              <img src={logo} alt="Loading..." />
-            </div>
-            :
-            valittuTentti !== undefined && <div style={{ width: '100%' }}>
-              {valittuTentti.kysymykset.map(kysymys =>
-                <Kysymys key={kysymys.id} kysymysVastaukset={haeVastaus(valittuTentti.id, kysymys.id)} näytäVastaukset={näytäVastaukset} handleCheckboxChange={valitseVastaus} valittu kysymys={kysymys} />
-              )}
-
-
-              <Button color="primary" variant="contained" onClick={muutaNäytävastaukset}>
-                {näytäVastaukset ?
-                  "Piilota Vastaukset"
-                  :
-                  "Näytä vastaukset"
-                }
-              </Button>
-
-
-            </div>
-          }
-
         </div>
-      </div>
-    </div >
+
+        <div style={mainContainerStyle}>
+          <div style={tableContainerStyle}>
+            <div style={{ display: 'flex', flexDirection: 'row', width: '100%' }}>
+              {tentit.map((tentti, i) =>
+
+                <Fade right>
+                  <Button key={i} color="primary" variant={tentti.id === checkValittuTentti() ? "outlined" : "text"} onClick={() => valitseTentti(tentti)} >{tentti.nimi}</Button>
+                </Fade>
+              )}
+            </div>
+
+
+            {state.loading ?
+              <div style={{ width: '100%' }}>
+                <img src={logo} alt="Loading..." />
+              </div>
+              :
+              state.valittuTentti !== undefined && <div style={{ width: '100%' }}>
+                {state.valittuTentti.kysymykset.map(kysymys =>
+                  <Kysymys key={kysymys.id} kysymysVastaukset={haeVastaus(state.valittuTentti.id, kysymys.id)} handleCheckboxChange={valitseVastaus} kysymys={kysymys} />
+                )}
+
+                <Button color="primary" variant="contained" onClick={muutaNäytävastaukset}>
+                  {state.näytäVastaukset ?
+                    "Piilota Vastaukset"
+                    :
+                    "Näytä vastaukset"
+                  }
+                </Button>
+
+              </div>
+            }
+
+          </div>
+        </div>
+      </UserContext.Provider>
+ 
   );
 }
 
-export default App;
+export { App, UserContext }
+

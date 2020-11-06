@@ -20,3 +20,5 @@ tulos = operaatiot[operaattori](arvo1, arvo2))
 material-ui:
 
 <link> komponentit public/index.html
+
+VS-code F12 pääsee funktiokutsuun ja takaisin
