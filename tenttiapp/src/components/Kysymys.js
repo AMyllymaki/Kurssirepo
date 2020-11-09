@@ -1,11 +1,11 @@
 import Checkbox from '@material-ui/core/Checkbox';
 import Paper from '@material-ui/core/Paper';
-import { withStyles, duration } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import { green } from '@material-ui/core/colors';
 import { UserContext } from '../App.js'
 import { useContext } from 'react';
 import logo from '../images/selmaStill.png'
-import Fade from 'react-reveal/Fade';
+
 
 
 //This is from material-ui documentation
@@ -33,7 +33,7 @@ function Kysymys(props) {
     const { kuvaus, vastausVaihtoehdot, oikeatVastaukset } = props.kysymys
     const vastaukset = props.kysymysVastaukset
 
-    const { state, dispatch } = useContext(UserContext)
+    const { state } = useContext(UserContext)
 
     const handleChange = (i) => {
         props.handleCheckboxChange(vastaukset.tenttiID, vastaukset.kysymysID, i)
@@ -41,13 +41,12 @@ function Kysymys(props) {
 
     return (
 
-
         <Paper style={{ width: '100%', padding: 15 }}>
-            <Fade right distance={'50%'}>
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+ 
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                     {state.näytäVastaukset ?
 
-                        <div style={{ }}>
+                        <div >
                             {kuvaus}
                             {vastausVaihtoehdot.map((vastausVaihtoehto, i) =>
 
@@ -71,7 +70,7 @@ function Kysymys(props) {
                                 </div>)}
                         </div>
                         :
-                        <div style={{ padding: 10 }}>
+                        <div style={{}}>
                             {kuvaus}
                             {vastausVaihtoehdot.map((vastausVaihtoehto, i) =>
 
@@ -97,7 +96,6 @@ function Kysymys(props) {
 
                     </div>
                 </div>
-            </Fade>
         </Paper>
     )
 }
