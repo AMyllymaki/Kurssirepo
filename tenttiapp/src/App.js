@@ -26,6 +26,13 @@ const tableContainerStyle =
   width: 1184,
 }
 
+//Bugeja (tai jotain sinne päin)
+
+//Vastaukset katoavat jos käydään admin puolella. 
+//Tämä on koska jos admin puolella tehdään muutoksia niin vastaukset eivät ole välttämättä enää järkeviä
+
+
+
 const UserContext = createContext(null)
 
 
@@ -43,7 +50,7 @@ const luoVastaukset = (tentit, forceFromState = false) => {
 
     let vastaukset = []
 
-    //tentti consia käytetään staten luomisessa, joten ei käytetä vielä state.tentit
+    //tentti constia käytetään staten luomisessa, joten ei käytetä vielä state.tentit
     tentit.forEach(tentti => {
 
       let tenttiID = tentti.id
@@ -100,7 +107,7 @@ const initialState =
   vastaukset: luoVastaukset(initialTentit),
   loading: false,
   tentit: initialTentit,
-  admin: true,
+  admin: false,
 }
 
 const reducer = (state = initialState, action) => {
@@ -176,6 +183,11 @@ function App() {
     dispatch({ type: "MuutaVastaukset", payload: vastaukset })
   }
 
+  const tentit = () =>
+  {
+
+  }
+
   const vaihdaKäyttäjää = () => {
     let vastaukset = luoVastaukset(state.tentit, true)
     dispatch({ type: "MuutaVastaukset", payload: vastaukset })
@@ -187,7 +199,7 @@ function App() {
     <UserContext.Provider value={{ state, dispatch }}>
       <div style={{ backgroundColor: '#3F51B5' }}>
         <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
-          <Button onClick={nollaaVastaukset} style={{ color: 'white' }}>Tentit</Button>
+          <Button onClick={tentit} style={{ color: 'white' }}>Tentit</Button>
           <Button onClick={nollaaVastaukset} style={{ color: 'white' }}>Nollaa-vastaukset</Button>
           <Button onClick={vaihdaKäyttäjää} style={{ color: 'white' }}>{state.admin ? "Vaihda Normikäyttäjäksi" : "Vaihda Adminiksi"}</Button>
           
