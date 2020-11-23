@@ -56,7 +56,7 @@ function VastausLista() {
 
 
     const haeVastaus = (tenttiID, kysymysID) => {
-
+     
         let palautettavaVastaus = state.vastaukset.find(vastaus => vastaus.tenttiID === tenttiID && vastaus.kysymysID === kysymysID)
 
         return palautettavaVastaus
@@ -85,9 +85,9 @@ function VastausLista() {
 
     let valittuTentti = haeIDllä(state.valittuTenttiIndex, state.tentit)
 
- 
+
     return (<div style={{ width: '100%' }}>
-        <div style={{ display: 'flex', flexDirection: 'row', width: '100%',flexWrap:'wrap' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', width: '100%', flexWrap: 'wrap' }}>
             {state.tentit.map((tentti, i) =>
 
                 <Button key={i} color="primary" variant={tentti.id === checkValittuTentti(valittuTentti) ? "outlined" : "text"} onClick={() => valitseTentti(tentti)} >{tentti.nimi}</Button>

@@ -1,10 +1,12 @@
-import { useEffect, useReducer, createContext } from "react"
+import { useEffect, useReducer, createContext, useState } from "react"
 import Button from '@material-ui/core/Button';
 import AlkuperäisetTentit from './components/AlkuperäisetTentit'
 
 import VastausLista from './components/VastausLista'
 import VastausListaAdmin from './components/Admin/VastausListaAdmin'
+import { createData, fetchData, patchData, fetchVastaukset, createVastaukset, patchVastaukset } from './components/AxiosFunctions'
 
+import useInterval from "./components/useInterval"
 
 const mainContainerStyle =
 {
@@ -35,78 +37,20 @@ const tableContainerStyle =
 
 const UserContext = createContext(null)
 
-
-const luoVastaukset = (tentit, forceFromState = false) => {
-
-  let storedData = window.localStorage.getItem('vastaukset')
-
-
-  if (storedData !== null && storedData !== undefined && JSON.parse(storedData) !== null && !forceFromState) {
-
-    return JSON.parse(storedData)
-  }
-  else {
-
-
-    let vastaukset = []
-
-    //tentti constia käytetään staten luomisessa, joten ei käytetä vielä state.tentit
-    tentit.forEach(tentti => {
-
-      let tenttiID = tentti.id
-
-      tentti.kysymykset.forEach(kysymys => {
-
-        let vastaus =
-        {
-          tenttiID: tenttiID,
-          kysymysID: undefined,
-          vastaukset: [],
-        }
-
-        vastaus.kysymysID = kysymys.id
-        vastaus.vastaukset = new Array(kysymys.vastausVaihtoehdot.length).fill(false)
-
-        vastaukset.push(vastaus)
-      })
-    });
-
-    return vastaukset
-  }
-}
-
-
-
-const luoTentit = () => {
-
-  let storedData = window.localStorage.getItem('tentit')
-
-
-  if (storedData !== null && storedData !== undefined && JSON.parse(storedData) !== null) {
-
-    return JSON.parse(storedData)
-  }
-
-  return AlkuperäisetTentit
-}
-
-
-
 const nollaaVastaukset = () => {
   window.localStorage.removeItem('vastaukset')
 }
 
 
-const initialTentit = luoTentit()
 
 
 const initialState =
 {
   näytäVastaukset: false,
   valittuTenttiIndex: undefined,
-  vastaukset: luoVastaukset(initialTentit),
+  vastaukset: undefined,
   loading: false,
-  tentit: initialTentit,
+  tentit: undefined,
   admin: false,
 }
 
@@ -152,70 +96,172 @@ const reducer = (state = initialState, action) => {
   }
 }
 
+const timedPatch = (vastaukset,tentit) => {
+
+  console.log(vastaukset)
+  console.log(tentit)
+
+  patchVastaukset(0, vastaukset)
+  patchData(0, tentit)
+}
+
+
 function App() {
 
   const [state, dispatch] = useReducer(reducer, initialState)
+  let [count, setCount] = useState(0);
 
 
 
+
+  useInterval(() => {
+    setCount(count + 1);
+    console.log(count)
+    timedPatch(state.vastaukset, state.tentit)
+  }, 5000);
+
+ 
   useEffect(() => {
 
-    window.localStorage.setItem('vastaukset', JSON.stringify(state.vastaukset))
+    luoTentit().then((response) => {
+      if (response !== undefined) {
+
+        luoVastaukset(response)
+        dispatch({ type: "LuoTentit", payload: response })
+
+      }
+    })
+
+  }, [])
+
+
+  const luoTentit = async () => {
+
+    let luodutTentit = await fetchData().then((response) => {
+
+      if (response.data !== undefined) {
+
+        return response.data
+      }
+
+    }).catch((exception) => {
+
+      createData(AlkuperäisetTentit)
+    })
+
+    if (luodutTentit === undefined) {
+      luodutTentit = AlkuperäisetTentit
+    }
+
+    return luodutTentit
+  }
 
 
 
-  }, [state.vastaukset]);
 
-  useEffect(() => {
+  const luoVastaukset = async (tenttis, forceFromState = false) => {
+
+    if (tenttis === undefined) {
+      return
+    }
+
+    if (!forceFromState) {
+
+      let luodutVastaukset = await fetchVastaukset().then((response) => {
 
 
-    window.localStorage.setItem('tentit', JSON.stringify(state.tentit))
 
-  }, [state.tentit]);
+        if (response.data !== undefined) {
 
+          return response.data
+        }
 
-  const nollaaKaikki = () => {
-    window.localStorage.clear()
-    let initialTentit = luoTentit()
-    let vastaukset = luoVastaukset(initialTentit)
+      }).catch((exception) => {
 
-    dispatch({ type: "LuoTentit", payload: initialTentit })
+        return undefined
+      })
+
+      if (luodutVastaukset !== undefined) {
+
+        dispatch({ type: "MuutaVastaukset", payload: luodutVastaukset })
+        return
+      }
+    }
+
+    let vastaukset = []
+
+    //tentti constia käytetään staten luomisessa, joten ei käytetä vielä state.tentit
+    tenttis.forEach(tentti => {
+
+      let tenttiID = tentti.id
+
+      tentti.kysymykset.forEach(kysymys => {
+
+        let vastaus =
+        {
+          tenttiID: tenttiID,
+          kysymysID: undefined,
+          vastaukset: [],
+        }
+
+        vastaus.kysymysID = kysymys.id
+        vastaus.vastaukset = new Array(kysymys.vastausVaihtoehdot.length).fill(false)
+
+        vastaukset.push(vastaus)
+      })
+    });
+
+   
     dispatch({ type: "MuutaVastaukset", payload: vastaukset })
+
+    if (forceFromState) {
+
+    }
+    else {
+      createVastaukset(vastaukset)
+    }
+
   }
 
-  const tentit = () =>
-  {
-
-  }
 
   const vaihdaKäyttäjää = () => {
     let vastaukset = luoVastaukset(state.tentit, true)
-    dispatch({ type: "MuutaVastaukset", payload: vastaukset })
     dispatch({ type: "VaihdaKäyttäjä", payload: !state.admin })
+  }
+
+  const tentit = () => {
+
   }
 
   return (
 
     <UserContext.Provider value={{ state, dispatch }}>
-      <div style={{ backgroundColor: '#3F51B5' }}>
-        <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
-          <Button onClick={tentit} style={{ color: 'white' }}>Tentit</Button>
-          <Button onClick={nollaaVastaukset} style={{ color: 'white' }}>Nollaa-vastaukset</Button>
-          <Button onClick={vaihdaKäyttäjää} style={{ color: 'white' }}>{state.admin ? "Vaihda Normikäyttäjäksi" : "Vaihda Adminiksi"}</Button>
-          
-        </div>
-      </div>
+      {state.tentit === undefined || state.vastaukset === undefined ?
+        []
+        :
+        <div>
+          <div style={{ backgroundColor: '#3F51B5' }}>
+            <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
+              <Button onClick={tentit} style={{ color: 'white' }}>Tentit</Button>
+              <Button onClick={nollaaVastaukset} style={{ color: 'white' }}>Nollaa-vastaukset</Button>
+              <Button onClick={vaihdaKäyttäjää} style={{ color: 'white' }}>{state.admin ? "Vaihda Normikäyttäjäksi" : "Vaihda Adminiksi"}</Button>
 
-      <div style={mainContainerStyle}>
-        <div style={tableContainerStyle}>
-          {state.admin ?
-            <VastausListaAdmin />
-            :
-            <VastausLista />
-          }
+            </div>
+          </div>
 
+          <div style={mainContainerStyle}>
+            <div style={tableContainerStyle}>
+              {state.admin ?
+                <VastausListaAdmin />
+                :
+                <VastausLista />
+              }
+
+            </div>
+          </div>
         </div>
-      </div>
+      }
+
     </UserContext.Provider>
 
   );

@@ -105,8 +105,6 @@ function VastausListaAdmin() {
             tmpTentit = tmpTentit.filter(tentti => tentti.id !== tenttiID)
         }
 
-        console.log(tmpTentit)
-
         dispatch({ type: "MuutaTenttejä", payload: tmpTentit })
     }
 

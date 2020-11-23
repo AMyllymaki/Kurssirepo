@@ -22,3 +22,9 @@ material-ui:
 <link> komponentit public/index.html
 
 VS-code F12 pääsee funktiokutsuun ja takaisin
+
+Codepen React memo
+Käytä usememo + usecallback jos sovellus hidastuu renderöinnistä TAI
+Renderöi myöhemmin onBlur funktiolla
+
+Jos tarvitsee DOM puusta tietyn objektin, käytä useRef
