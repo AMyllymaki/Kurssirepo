@@ -1,0 +1,123 @@
+//LISÄYS
+
+//Luodaan käyttäjä
+INSERT INTO käyttäjä(EtuNimi, Sukunimi, Sähköposti, Salasana, Rooli) VALUES ('Pekka', 'Puupää', 'pekka@puupaa.fi', 'pekka', 'Käyttäjä')
+
+//Luodaan Tentti
+INSERT INTO tentti(nimi, minimipisteet) VALUES ('Kemian Perusteet', 6)
+
+
+//Luodaan Aihe
+INSERT INTO aihe(aihe) VALUES ('Avaruus')
+
+//Luodaan Kysymys
+INSERT INTO kysymys(kysymys, aihe_id) VALUES ('Onko kuu juustoa', 1)
+
+//Luodaan Vastausvaihtoehdot
+INSERT INTO vastausvaihtoehto(vaihtoehto, oikea_vastaus, kysymys_id) VALUES ('Kyllä', false, 1);
+INSERT INTO vastausvaihtoehto(vaihtoehto, oikea_vastaus, kysymys_id) VALUES ('Ei', false, 1);
+INSERT INTO vastausvaihtoehto(vaihtoehto, oikea_vastaus, kysymys_id) VALUES ('Riippuu kuusta', true, 1);
+
+//Luodaan Vastaus
+INSERT INTO vastaus(tyyppi, vastauspäivämäärä, vaihtoehto_id, käyttäjä_id) VALUES (true, now(), 3, 1)
+
+//Luodaan käyttäjän ja tentin yhdistävä taulu
+INSERT INTO tenttikäsittelijä(tentti_id, käyttäjä_id) VALUES (1,1)
+
+//Luodaan tentin ja kysymyksen yhdistävä taulu
+INSERT INTO tenttikysymykset(tentti_id, kysymys_id) VALUES (1,1)
+
+//HAKU
+
+//SELECT ALL
+SELECT * FROM tentti
+
+//SELECT WITH ID
+SELECT * FROM tentti WHERE id=1
+
+//Haetaan kysymyksen vastausvaihtoehdot
+SELECT *
+FROM vastausvaihtoehto
+WHERE kysymys_id IN (SELECT kysymys_id FROM vastaus WHERE kysymys_id=1)
+
+//Hakee käyttäjän nro1 vastaukset kysymykseen
+SELECT *
+FROM vastaus
+WHERE käyttäjä_id=1 AND vaihtoehto_id  
+IN 
+(SELECT vaihtoehto_id FROM vastausvaihtoehto WHERE kysymys_id 
+IN
+(SELECT kysymys_id from kysymys where id=1)) 
+
+//Hakee tentti nro1 kysymykset
+SELECT *
+FROM kysymys
+WHERE id  
+IN 
+(SELECT kysymys_id FROM tenttikysymykset WHERE tentti_id 
+IN
+(SELECT tentti_id from tentti where id=1))
+
+//Hakee käyttäjän nro1 tentit
+SELECT *
+FROM tentti
+WHERE id
+IN 
+(SELECT tentti_id FROM tenttikäsittelijä WHERE käyttäjä_id
+IN
+(SELECT käyttäjä_id from käyttäjä where id=1)) 
+
+//Muokkaa tenttiä
+UPDATE tentti
+SET nimi='matikan perusteet', minimipisteet=3, julkaisuajankohta=?
+WHERE id=1;
+
+//Muokkaa kysymystä
+UPDATE kysymys
+SET kysymys='Onko maito aitoa?', aihe_id=1
+WHERE id=1;
+
+//Muokkaa vastausvaihtoehtoa
+UPDATE vastausvaihtoehto
+SET vaihtoehto='Ehkä', oikea_vastaus=true
+WHERE id=5;
+
+//Muokkaa vastausta
+UPDATE vastaus
+SET tyyppi=true, vastauspäivämäärä=now()
+WHERE id=1;
+
+//AloitaTentti
+UPDATE tenttikäsittelijä
+SET tentin_aloitusajankohta=now()
+WHERE tentti_id = 1 AND käyttäjä_id = 1;
+
+
+//POISTO (tässä ei ole vielä tehty poistetun vastauksen vastausvaihtoehtojen ja vastausten poistamista, jos sellainen halutaan tehdä)
+
+DELETE 
+FROM vastaus 
+WHERE id=1;
+
+
+DELETE 
+FROM tentti
+WHERE id=1;
+
+
+DELETE 
+FROM kysymys 
+WHERE id=1;
+
+
+DELETE 
+FROM vastausvaihtoehto
+WHERE id=1;
+
+
+DELETE 
+FROM käyttäjä
+WHERE id=1;
+
+
+

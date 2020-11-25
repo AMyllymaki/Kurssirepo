@@ -52,6 +52,7 @@ const initialState =
   loading: false,
   tentit: undefined,
   admin: false,
+  näytäGraafi: false,
 }
 
 const reducer = (state = initialState, action) => {
@@ -90,6 +91,12 @@ const reducer = (state = initialState, action) => {
       return newState
     case "VaihdaKäyttäjä":
       newState.admin = action.payload
+      return newState
+      case "NäytäGraafi":
+      newState.näytäGraafi = true
+      return newState
+    case "PiilotaGraafi":
+      newState.näytäGraafi = false
       return newState
     default:
       return newState
