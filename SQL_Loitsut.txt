@@ -1,7 +1,7 @@
 //LISÄYS
 
 //Luodaan käyttäjä
-INSERT INTO käyttäjä(EtuNimi, Sukunimi, Sähköposti, Salasana, Rooli) VALUES ('Pekka', 'Puupää', 'pekka@puupaa.fi', 'pekka', 'Käyttäjä')
+INSERT INTO käyttäjä(EtuNimi, Sukunimi, Sähköposti, Salasana, Rooli) VALUES ('Pekka Puupaa', 'Puupää', 'pekka@puupaa.fi', 'pekka', 'Käyttäjä')
 
 //Luodaan Tentti
 INSERT INTO tentti(nimi, minimipisteet) VALUES ('Kemian Perusteet', 6)
@@ -54,9 +54,8 @@ SELECT *
 FROM kysymys
 WHERE id  
 IN 
-(SELECT kysymys_id FROM tenttikysymykset WHERE tentti_id 
-IN
-(SELECT tentti_id from tentti where id=1))
+(SELECT kysymys_id FROM tenttikysymykset WHERE tentti_id = 1)
+
 
 //Hakee käyttäjän nro1 tentit
 SELECT *

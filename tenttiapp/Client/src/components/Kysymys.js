@@ -30,72 +30,75 @@ function arrayEquals(a, b) {
 function Kysymys(props) {
 
 
-    const { kuvaus, vastausVaihtoehdot, oikeatVastaukset } = props.kysymys
-    const vastaukset = props.kysymysVastaukset
+    const { kysymys, vastausVaihtoehdot, oikeatVastaukset } = props.kysymys
+    //const vastaukset = props.kysymysVastaukset
 
     const { state } = useContext(UserContext)
 
     const handleChange = (i) => {
-        props.handleCheckboxChange(vastaukset.tenttiID, vastaukset.kysymysID, i)
+      //  props.handleCheckboxChange(vastaukset.tenttiID, vastaukset.kysymysID, i)
     }
 
     return (
 
         <Paper style={{ width: '100%', padding: 15 }}>
- 
-                <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                    {state.näytäVastaukset ?
 
-                        <div >
-                            {kuvaus}
-                            {vastausVaihtoehdot.map((vastausVaihtoehto, i) =>
+            <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                {state.näytäVastaukset ?
 
-                                <div key={i} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-                                    <Checkbox
-                                        checked={vastaukset.vastaukset[i]}
-                                        color="primary"
-                                        disableRipple={true}
-                                        inputProps={{ 'aria-label': 'secondary checkbox' }}
+                    <div >
+                        {kysymys}
+                        {vastausVaihtoehdot.map((vastausVaihtoehto, i) =>
 
-                                    />
-                                    <GreenCheckbox
-                                        checked={oikeatVastaukset[i]}
-                                        color="primary"
-                                        disableRipple={true}
-                                        inputProps={{ 'aria-label': 'secondary checkbox' }}
-                                    />
+                            <div key={i} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                                <Checkbox
+                                    //checked={vastaukset.vastaukset[i]}
+                                    checked={false}
+                                    color="primary"
+                                    disableRipple={true}
+                                    inputProps={{ 'aria-label': 'secondary checkbox' }}
 
-                                    {vastausVaihtoehto}
+                                />
+                                <GreenCheckbox
 
-                                </div>)}
-                        </div>
-                        :
-                        <div style={{}}>
-                            {kuvaus}
-                            {vastausVaihtoehdot.map((vastausVaihtoehto, i) =>
+                                    checked={vastausVaihtoehto.oikea_vastaus}
+                                    color="primary"
+                                    disableRipple={true}
+                                    inputProps={{ 'aria-label': 'secondary checkbox' }}
+                                />
 
-                                <div key={i} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-                                    <Checkbox
-                                        checked={vastaukset.vastaukset[i]}
-                                        onChange={() => handleChange(i)}
+                                {vastausVaihtoehto.vaihtoehto}
 
-                                        inputProps={{ 'aria-label': 'primary checkbox' }}
-                                    />
-                                    {vastausVaihtoehto}
-                                </div>)}
-                        </div>
+                            </div>)}
+                    </div>
+                    :
+                    <div style={{}}>
+                        {kysymys}
+                        {vastausVaihtoehdot.map((vastausVaihtoehto, i) =>
+
+                            <div key={i} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
+                                <Checkbox
+                                    //checked={vastaukset.vastaukset[i]}
+                                    checked={false}
+                                    onChange={() => handleChange(i)}
+
+                                    inputProps={{ 'aria-label': 'primary checkbox' }}
+                                />
+                                {vastausVaihtoehto.vaihtoehto}
+                            </div>)}
+                    </div>
+                }
+
+
+
+                <div style={{ padding: 50 }}>
+
+                    {//arrayEquals(vastaukset.vastaukset, oikeatVastaukset) && state.näytäVastaukset &&
+                       // <img width={50} height={50} src={logo} alt="Loading..." />
                     }
 
-
-
-                    <div style={{ padding: 50 }}>
-
-                        {arrayEquals(vastaukset.vastaukset, oikeatVastaukset) && state.näytäVastaukset &&
-                            <img width={50} height={50} src={logo} alt="Loading..." />
-                        }
-
-                    </div>
                 </div>
+            </div>
         </Paper>
     )
 }

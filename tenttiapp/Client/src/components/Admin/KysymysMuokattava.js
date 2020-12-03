@@ -11,7 +11,7 @@ import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
 function KysymysMuokattava(props) {
 
 
-    const { kuvaus, vastausVaihtoehdot, oikeatVastaukset } = props.kysymys
+    const { kysymys, vastausVaihtoehdot, oikeatVastaukset } = props.kysymys
 
     const checkboxClicked = (e, i) =>
     {
@@ -49,7 +49,7 @@ function KysymysMuokattava(props) {
                 <div style={{ width: '100%' }}>
                     <TextField
                         fullWidth
-                        label={kuvaus}
+                        label={kysymys}
                         variant="outlined"
                         onChange={(e) => muutaKysymyksenKuvaus(e)} />
 
@@ -61,17 +61,17 @@ function KysymysMuokattava(props) {
 
                         <div key={i} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                             <Checkbox
-                                checked={oikeatVastaukset[i]}
-                                onChange={(e) => checkboxClicked(e,i)}
+                                checked={vastausVaihtoehto.oikea_vastaus}
+                                onChange={(e) => checkboxClicked(e,vastausVaihtoehto.id)}
                                 inputProps={{ 'aria-label': 'primary checkbox' }}
                             />
                             <TextField
                                 fullWidth
-                                label={vastausVaihtoehto}
+                                label={vastausVaihtoehto.vaihtoehto}
                                 variant="outlined"
-                                onChange={(e) => muutaVastauksenKuvaus(e, i)} />
+                                onChange={(e) => muutaVastauksenKuvaus(e, vastausVaihtoehto.id)} />
 
-                            <IconButton onClick={() => PoistaVastaus(i)}>
+                            <IconButton onClick={() => PoistaVastaus(vastausVaihtoehto.id)}>
                                 <DeleteIcon />
                             </IconButton>
                         </div>)}

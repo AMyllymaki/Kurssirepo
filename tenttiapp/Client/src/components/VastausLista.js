@@ -10,6 +10,8 @@ import { Doughnut } from 'react-chartjs-2';
 import { Pie } from 'react-chartjs-2';
 import { Bar } from 'react-chartjs-2';
 import { Radar } from 'react-chartjs-2'
+import { uusiKysymysKannasta } from './kysymysObjekti'
+import { haeTentinKysymykset } from "./HttpRequests/TenttiKysymysRequests.js"
 
 function VastausLista() {
 
@@ -20,8 +22,27 @@ function VastausLista() {
     let lataus = undefined
 
 
-    const valitseTentti = (tentti) => {
-        lataa()
+   const valitseTentti = (tentti) => {
+
+        haeTentinKysymykset(tentti.id).then((kysymykset) => {
+
+            let tmpKysymykset = []
+            let tmpTentit = JSON.parse(JSON.stringify(state.tentit))
+            let muutettuTentti = haeIDllä(tentti.id, tmpTentit)
+
+            kysymykset.forEach(kysymys => {
+                let uusiKysymys = uusiKysymysKannasta(kysymys)
+                tmpKysymykset.push(uusiKysymys)
+            });
+
+            muutettuTentti.kysymykset = tmpKysymykset
+            dispatch({ type: "MuutaTenttejä", payload: tmpTentit })
+
+
+        }).catch((error) => {
+            console.log(error)
+        })
+
         dispatch({ type: "PiilotaVastaukset" })
         dispatch({ type: "MuutaValittuTentti", payload: tentti.id })
     }
@@ -62,6 +83,8 @@ function VastausLista() {
 
 
     const haeVastaus = (tenttiID, kysymysID) => {
+
+        return ""
 
         let palautettavaVastaus = state.vastaukset.find(vastaus => vastaus.tenttiID === tenttiID && vastaus.kysymysID === kysymysID)
 

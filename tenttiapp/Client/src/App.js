@@ -5,8 +5,7 @@ import AlkuperäisetTentit from './components/AlkuperäisetTentit'
 import VastausLista from './components/VastausLista'
 import VastausListaAdmin from './components/Admin/VastausListaAdmin'
 import { createData, fetchData, patchData, fetchVastaukset, createVastaukset, patchVastaukset } from './components/AxiosFunctions'
-
-import useInterval from "./components/useInterval"
+import { haeTentit } from "./components/HttpRequests/tenttiRequests.js"
 
 const mainContainerStyle =
 {
@@ -40,9 +39,6 @@ const UserContext = createContext(null)
 const nollaaVastaukset = () => {
   window.localStorage.removeItem('vastaukset')
 }
-
-
-
 
 const initialState =
 {
@@ -92,7 +88,7 @@ const reducer = (state = initialState, action) => {
     case "VaihdaKäyttäjä":
       newState.admin = action.payload
       return newState
-      case "NäytäGraafi":
+    case "NäytäGraafi":
       newState.näytäGraafi = true
       return newState
     case "PiilotaGraafi":
@@ -103,37 +99,18 @@ const reducer = (state = initialState, action) => {
   }
 }
 
-const timedPatch = (vastaukset,tentit) => {
-
-  console.log(vastaukset)
-  console.log(tentit)
-
-  patchVastaukset(0, vastaukset)
-  patchData(0, tentit)
-}
-
 
 function App() {
 
   const [state, dispatch] = useReducer(reducer, initialState)
-  let [count, setCount] = useState(0);
 
-
-
-
-  useInterval(() => {
-    setCount(count + 1);
-    console.log(count)
-    timedPatch(state.vastaukset, state.tentit)
-  }, 5000);
-
- 
   useEffect(() => {
 
     luoTentit().then((response) => {
       if (response !== undefined) {
 
-        luoVastaukset(response)
+
+        //luoVastaukset(response)
         dispatch({ type: "LuoTentit", payload: response })
 
       }
@@ -144,9 +121,16 @@ function App() {
 
   const luoTentit = async () => {
 
-    let luodutTentit = await fetchData().then((response) => {
+    let luodutTentit = await haeTentit().then((response) => {
 
       if (response.data !== undefined) {
+
+        let tentit = response.data
+
+        tentit.forEach(tentti => {
+
+          tentti.kysymykset = []
+        });
 
         return response.data
       }
@@ -218,7 +202,7 @@ function App() {
       })
     });
 
-   
+
     dispatch({ type: "MuutaVastaukset", payload: vastaukset })
 
     if (forceFromState) {
@@ -232,7 +216,7 @@ function App() {
 
 
   const vaihdaKäyttäjää = () => {
-    let vastaukset = luoVastaukset(state.tentit, true)
+    //  let vastaukset = luoVastaukset(state.tentit, true)
     dispatch({ type: "VaihdaKäyttäjä", payload: !state.admin })
   }
 
@@ -243,7 +227,7 @@ function App() {
   return (
 
     <UserContext.Provider value={{ state, dispatch }}>
-      {state.tentit === undefined || state.vastaukset === undefined ?
+      {state.tentit === undefined ?
         []
         :
         <div>

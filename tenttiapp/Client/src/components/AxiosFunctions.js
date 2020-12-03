@@ -14,7 +14,7 @@ export const createData = async (data) => {
 
 export const fetchData = async () => {
     try {
-        let result = await axios.get("http://localhost:3000/tentit")
+        let result = await axios.get("http://localhost:4000/1")
 
         if (result.data.length > 0) {
 
