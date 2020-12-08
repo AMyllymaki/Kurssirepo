@@ -40,15 +40,18 @@ const nollaaVastaukset = () => {
   window.localStorage.removeItem('vastaukset')
 }
 
+
+
 const initialState =
 {
   näytäVastaukset: false,
   valittuTenttiIndex: undefined,
-  vastaukset: undefined,
+  vastaukset: [],
   loading: false,
   tentit: undefined,
   admin: false,
   näytäGraafi: false,
+  käyttäjäID: 1
 }
 
 const reducer = (state = initialState, action) => {
@@ -118,6 +121,11 @@ function App() {
 
   }, [])
 
+
+  const TarkistaState = () =>
+{
+  console.log(state)
+}
 
   const luoTentit = async () => {
 
@@ -234,7 +242,7 @@ function App() {
           <div style={{ backgroundColor: '#3F51B5' }}>
             <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
               <Button onClick={tentit} style={{ color: 'white' }}>Tentit</Button>
-              <Button onClick={nollaaVastaukset} style={{ color: 'white' }}>Nollaa-vastaukset</Button>
+              <Button onClick={TarkistaState} style={{ color: 'white' }}>Tarkista State</Button>
               <Button onClick={vaihdaKäyttäjää} style={{ color: 'white' }}>{state.admin ? "Vaihda Normikäyttäjäksi" : "Vaihda Adminiksi"}</Button>
 
             </div>

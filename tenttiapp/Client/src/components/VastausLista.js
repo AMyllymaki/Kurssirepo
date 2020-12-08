@@ -12,6 +12,8 @@ import { Bar } from 'react-chartjs-2';
 import { Radar } from 'react-chartjs-2'
 import { uusiKysymysKannasta } from './kysymysObjekti'
 import { haeTentinKysymykset } from "./HttpRequests/TenttiKysymysRequests.js"
+import { lisääVastaus, haeKäyttäjänVastauksetTenttiin, muokkaaVastausta } from "./HttpRequests/vastausRequests.js"
+
 
 function VastausLista() {
 
@@ -22,7 +24,7 @@ function VastausLista() {
     let lataus = undefined
 
 
-   const valitseTentti = (tentti) => {
+    const valitseTentti = (tentti) => {
 
         haeTentinKysymykset(tentti.id).then((kysymykset) => {
 
@@ -43,18 +45,60 @@ function VastausLista() {
             console.log(error)
         })
 
+        haeKäyttäjänVastauksetTenttiin(state.käyttäjäID, tentti.id).then((vastaukset) => {
+
+            dispatch({ type: "MuutaVastaukset", payload: vastaukset.data })
+
+        }).catch((error) => {
+            console.log(error)
+        })
+
         dispatch({ type: "PiilotaVastaukset" })
         dispatch({ type: "MuutaValittuTentti", payload: tentti.id })
     }
 
-    const valitseVastaus = (tenttiID, kysymysID, i) => {
+    const valitseVastaus = (vaihtoehto_id, id = undefined) => {
 
         let tmpVastaukset = [...state.vastaukset]
-        let vastaus = tmpVastaukset.find(vastaus => vastaus.tenttiID === tenttiID && vastaus.kysymysID === kysymysID)
+        let vastaus = haeIDllä(id, tmpVastaukset)
 
-        vastaus.vastaukset[i] = !vastaus.vastaukset[i]
+        if (vastaus === undefined) {
 
-        dispatch({ type: "MuutaVastaukset", payload: tmpVastaukset })
+            vastaus =
+            {
+                tyyppi: true,
+                vaihtoehto_id: vaihtoehto_id,
+                käyttäjä_id: state.käyttäjäID,
+            }
+
+            lisääVastaus(vastaus).then((response) => {
+
+                vastaus.id = response.id.toString()
+                vastaus.vastauspäivämäärä = response.vastauspäivämäärä.toString()
+                tmpVastaukset.push(vastaus)
+                dispatch({ type: "MuutaVastaukset", payload: tmpVastaukset })
+
+            }).catch((error) => {
+                console.log(error)
+            })
+
+        }
+        else {
+            
+            vastaus.tyyppi = !vastaus.tyyppi
+
+            console.log(vastaus.tyyppi)
+
+            muokkaaVastausta(vastaus).then((response) => {
+
+                dispatch({ type: "MuutaVastaukset", payload: tmpVastaukset })
+
+            }).catch((error) => {
+                console.log(error)
+            })
+
+
+        }
     }
 
 
@@ -121,7 +165,10 @@ function VastausLista() {
             return undefined
         }
 
-        return taulukko.find(alkio => alkio.id === id)
+
+        let subTaulukko = taulukko.find(alkio => alkio.id == id)
+
+        return subTaulukko
     }
 
     const luoGraafi = (type = 0) => {
@@ -139,12 +186,12 @@ function VastausLista() {
                             backgroundColor: [
                                 'rgba(54, 162, 235, 0.2)',
                                 'rgba(255, 99, 132, 0.2)',
-                            
+
                             ],
                             borderColor: [
                                 'rgba(54, 162, 235, 1)',
                                 'rgba(255, 99, 132, 1)',
-                           
+
 
                             ],
                             borderWidth: 1,
@@ -153,29 +200,29 @@ function VastausLista() {
                 }
                 return <Pie data={data} />
 
-                case 1:
-                    data = {
-                        labels: ['Oikein', 'Väärin'],
-                        datasets: [
-                            {
-                                label: '# of Votes',
-                                data: [43, 7],
-                                backgroundColor: [
-                                    'rgba(54, 162, 235, 0.2)',
-                                    'rgba(255, 99, 132, 0.2)',
-                                
-                                ],
-                                borderColor: [
-                                    'rgba(54, 162, 235, 1)',
-                                    'rgba(255, 99, 132, 1)',
-                               
-    
-                                ],
-                                borderWidth: 1,
-                            },
-                        ],
-                    }
-                    return <Doughnut data={data} />
+            case 1:
+                data = {
+                    labels: ['Oikein', 'Väärin'],
+                    datasets: [
+                        {
+                            label: '# of Votes',
+                            data: [43, 7],
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.2)',
+                                'rgba(255, 99, 132, 0.2)',
+
+                            ],
+                            borderColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 99, 132, 1)',
+
+
+                            ],
+                            borderWidth: 1,
+                        },
+                    ],
+                }
+                return <Doughnut data={data} />
             case 2:
 
                 var options = {
@@ -246,15 +293,15 @@ function VastausLista() {
                 }
                 return <Bar data={data} options={options} />
 
-         
+
             case 4:
 
                 var options = {
-                  
+
                     scale: {
-                      ticks: { beginAtZero: true },
+                        ticks: { beginAtZero: true },
                     },
-                  }
+                }
 
                 data = {
                     labels: ['Aritmetiikka', 'Todennäköisyys', "Geometria", "Trigonometria", "Joukko-oppi"],
@@ -268,7 +315,7 @@ function VastausLista() {
                 }
 
 
-                return <Radar data={data} options={options}/>
+                return <Radar data={data} options={options} />
         }
 
 

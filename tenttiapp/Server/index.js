@@ -463,6 +463,22 @@ const db = require('./db');
         })
     })
 
+    //Hae yhden käyttäjän kaikki vastaukset yhteen tenttiin
+
+    app.get('/vastaus/kayttaja/:kayttaja_id/tentti/:tentti_id', (req, res) =>
+    {
+        let SQLRequest = 'SELECT * FROM vastaus WHERE käyttäjä_id=$1 AND vaihtoehto_id IN (SELECT id FROM vastausvaihtoehto WHERE kysymys_id IN(SELECT id FROM kysymys WHERE id IN (SELECT kysymys_id FROM tenttikysymys WHERE tentti_id = $2)))'
+
+        db.query(SQLRequest,[req.params.kayttaja_id, req.params.tentti_id], (err, result) => {
+
+            if (err) {
+                console.log(err)
+                return
+            }
+            res.send(result.rows)
+        })
+    })
+
     app.post('/vastaus/', (req, res) => {
 
         let tyyppi = req.body.tyyppi
@@ -470,7 +486,7 @@ const db = require('./db');
         let käyttäjä_id = req.body.käyttäjä_id
 
 
-        let SQLRequest = "INSERT INTO vastaus(tyyppi, vaihtoehto_id, käyttäjä_id, vastauspäivämäärä) VALUES ($1, $2, $3, now())"
+        let SQLRequest = "INSERT INTO vastaus(tyyppi, vaihtoehto_id, käyttäjä_id, vastauspäivämäärä) VALUES ($1, $2, $3, now()) RETURNING id, vastauspäivämäärä"
 
         db.query(SQLRequest, [tyyppi, vaihtoehto_id, käyttäjä_id], (err, result) => {
 
@@ -479,6 +495,7 @@ const db = require('./db');
                 console.log(err)
                 return
             }
+
             res.send(result.rows[0])
         })
     })
@@ -486,7 +503,9 @@ const db = require('./db');
     app.put('/vastaus/:id', (req, res) => {
 
         let tyyppi = req.body.tyyppi
-        let SQLRequest = "UPDATE vastaus SET tyyppi=$1 WHERE id=$2"
+        let SQLRequest = "UPDATE vastaus SET tyyppi=$1, vastauspäivämäärä=now() WHERE id=$2"
+
+        console.log(tyyppi)
 
         db.query(SQLRequest, [tyyppi, req.params.id], (err, result) => {
 

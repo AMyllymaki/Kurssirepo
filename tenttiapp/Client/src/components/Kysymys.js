@@ -27,16 +27,37 @@ function arrayEquals(a, b) {
 }
 
 
+
 function Kysymys(props) {
 
 
-    const { kysymys, vastausVaihtoehdot, oikeatVastaukset } = props.kysymys
+    const { kysymys, vastausVaihtoehdot } = props.kysymys
     //const vastaukset = props.kysymysVastaukset
 
     const { state } = useContext(UserContext)
 
-    const handleChange = (i) => {
-      //  props.handleCheckboxChange(vastaukset.tenttiID, vastaukset.kysymysID, i)
+    const handleChange = (vaihtoehtoID) => {
+
+        let vastaukset = state.vastaukset.filter(vastaus => vastaus.vaihtoehto_id === vaihtoehtoID)
+
+
+        if (vastaukset.length === 0) {
+
+            props.handleCheckboxChange(vaihtoehtoID, undefined)
+            return
+        }
+
+        props.handleCheckboxChange(vaihtoehtoID, vastaukset[0].id)
+    }
+
+    const checkIfChecked = (vaihtoehtoID) => {
+        let valinnat = state.vastaukset.filter(vastaus => vastaus.vaihtoehto_id === vaihtoehtoID)
+
+        if (valinnat.length === 0) {
+            return false
+        }
+
+        return valinnat[0].tyyppi
     }
 
     return (
@@ -78,10 +99,8 @@ function Kysymys(props) {
 
                             <div key={i} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                                 <Checkbox
-                                    //checked={vastaukset.vastaukset[i]}
-                                    checked={false}
-                                    onChange={() => handleChange(i)}
-
+                                    checked={checkIfChecked(vastausVaihtoehto.id)}
+                                    onChange={() => handleChange(vastausVaihtoehto.id)}
                                     inputProps={{ 'aria-label': 'primary checkbox' }}
                                 />
                                 {vastausVaihtoehto.vaihtoehto}
@@ -94,7 +113,7 @@ function Kysymys(props) {
                 <div style={{ padding: 50 }}>
 
                     {//arrayEquals(vastaukset.vastaukset, oikeatVastaukset) && state.näytäVastaukset &&
-                       // <img width={50} height={50} src={logo} alt="Loading..." />
+                        // <img width={50} height={50} src={logo} alt="Loading..." />
                     }
 
                 </div>
