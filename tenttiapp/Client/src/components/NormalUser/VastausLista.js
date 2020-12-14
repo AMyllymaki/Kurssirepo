@@ -1,18 +1,18 @@
 
-import { UserContext } from '../App.js'
+import { UserContext } from '../../App.js'
 import { useContext, useState } from 'react';
-import rand from './Random'
+import rand from '../Random'
 
 import Kysymys from './Kysymys'
-import logo from '../images/selmaSpin.gif'
+import logo from '../../images/selmaSpin.gif'
 import Button from '@material-ui/core/Button';
 import { Doughnut } from 'react-chartjs-2';
 import { Pie } from 'react-chartjs-2';
 import { Bar } from 'react-chartjs-2';
 import { Radar } from 'react-chartjs-2'
-import { uusiKysymysKannasta } from './kysymysObjekti'
-import { haeTentinKysymykset } from "./HttpRequests/TenttiKysymysRequests.js"
-import { lisääVastaus, haeKäyttäjänVastauksetTenttiin, muokkaaVastausta } from "./HttpRequests/vastausRequests.js"
+import { uusiKysymysKannasta } from '../ObjektiRakentajat/kysymysObjekti'
+import { haeTentinKysymykset } from "../HttpRequests/tenttiKysymysRequests.js"
+import { lisääVastaus, haeKäyttäjänVastauksetTenttiin, muokkaaVastausta } from "../HttpRequests/vastausRequests.js"
 
 
 function VastausLista() {
@@ -126,14 +126,6 @@ function VastausLista() {
     }
 
 
-    const haeVastaus = (tenttiID, kysymysID) => {
-
-        return ""
-
-        let palautettavaVastaus = state.vastaukset.find(vastaus => vastaus.tenttiID === tenttiID && vastaus.kysymysID === kysymysID)
-
-        return palautettavaVastaus
-    }
 
     const muutaNäytävastaukset = () => {
 
@@ -372,7 +364,6 @@ function VastausLista() {
                         {valittuTentti.kysymykset.map(kysymys =>
                             <Kysymys
                                 key={kysymys.id}
-                                kysymysVastaukset={haeVastaus(valittuTentti.id, kysymys.id)}
                                 handleCheckboxChange={valitseVastaus}
                                 kysymys={kysymys} />
                         )}

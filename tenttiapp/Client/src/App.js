@@ -1,11 +1,11 @@
-import { useEffect, useReducer, createContext, useState } from "react"
+import { useEffect, useReducer, createContext } from "react"
 import Button from '@material-ui/core/Button';
-import AlkuperäisetTentit from './components/AlkuperäisetTentit'
 
-import VastausLista from './components/VastausLista'
+import VastausLista from './components/NormalUser/VastausLista'
 import VastausListaAdmin from './components/Admin/VastausListaAdmin'
-import { createData, fetchData, patchData, fetchVastaukset, createVastaukset, patchVastaukset } from './components/AxiosFunctions'
 import { haeTentit } from "./components/HttpRequests/tenttiRequests.js"
+import Login from "./components/LoginPage/Login.js"
+import { loginToken } from "./components/HttpRequests/loginRequests.js"
 
 const mainContainerStyle =
 {
@@ -27,13 +27,6 @@ const tableContainerStyle =
   width: 1184,
 }
 
-//Bugeja (tai jotain sinne päin)
-
-//Vastaukset katoavat jos käydään admin puolella. 
-//Tämä on koska jos admin puolella tehdään muutoksia niin vastaukset eivät ole välttämättä enää järkeviä
-
-
-
 const UserContext = createContext(null)
 
 const nollaaVastaukset = () => {
@@ -51,7 +44,11 @@ const initialState =
   tentit: undefined,
   admin: false,
   näytäGraafi: false,
-  käyttäjäID: 1
+  käyttäjäID: undefined,
+  käyttäjäRooli: undefined,
+  username: "",
+  password: "",
+  passwordAgain: "",
 }
 
 const reducer = (state = initialState, action) => {
@@ -97,8 +94,32 @@ const reducer = (state = initialState, action) => {
     case "PiilotaGraafi":
       newState.näytäGraafi = false
       return newState
+    case "MuutaKäyttäjäID":
+      newState.käyttäjäID = action.payload
+      return newState
+
+    case "MuutaKäyttäjäRooli":
+      newState.käyttäjäRooli = action.payload
+      return newState
+    case "MuutaUsername":
+      newState.username = action.payload
+      return newState
+    case "MuutaPassword":
+      newState.password = action.payload
+      return newState
+    case "MuutaPasswordAgain":
+      newState.passwordAgain = action.payload
+      return newState
+    case "KirjauduUlos":
+      //Käyttäjällä pitäis olla omat tentit jotka haetaan kirjautuessa
+      let tmpTentit = newState.tentit
+      newState = initialState
+      newState.tentit = tmpTentit
+      return newState
     default:
       return newState
+
+
   }
 }
 
@@ -119,13 +140,45 @@ function App() {
       }
     })
 
+    LoginWithToken(localStorage.getItem('jwtToken'))
+
+
   }, [])
 
 
-  const TarkistaState = () =>
-{
-  console.log(state)
-}
+  const LoginWithToken = async (token) => {
+
+    
+    try {
+      let LoggedUser = await loginToken(token)
+
+      console.log(LoggedUser)
+
+      dispatch({ type: "MuutaPasswordAgain", payload: "" })
+      dispatch({ type: "MuutaPassword", payload: "" })
+      dispatch({ type: "MuutaUsername", payload: "" })
+      dispatch({ type: "MuutaKäyttäjäID", payload: LoggedUser.data.user.id })
+      dispatch({ type: "MuutaKäyttäjäRooli", payload: LoggedUser.data.user.rooli })
+    }
+    catch
+    {
+      console.log("Error in Token Login")
+
+    }
+  }
+
+
+  const TarkistaState = () => {
+    console.log(state)
+  }
+
+  const Logout = () => {
+
+    localStorage.setItem('jwtToken', null);
+            
+    dispatch({ type: "KirjauduUlos" })
+
+  }
 
   const luoTentit = async () => {
 
@@ -145,83 +198,14 @@ function App() {
 
     }).catch((exception) => {
 
-      createData(AlkuperäisetTentit)
     })
 
     if (luodutTentit === undefined) {
-      luodutTentit = AlkuperäisetTentit
+      luodutTentit = []
     }
 
     return luodutTentit
   }
-
-
-
-
-  const luoVastaukset = async (tenttis, forceFromState = false) => {
-
-    if (tenttis === undefined) {
-      return
-    }
-
-    if (!forceFromState) {
-
-      let luodutVastaukset = await fetchVastaukset().then((response) => {
-
-
-
-        if (response.data !== undefined) {
-
-          return response.data
-        }
-
-      }).catch((exception) => {
-
-        return undefined
-      })
-
-      if (luodutVastaukset !== undefined) {
-
-        dispatch({ type: "MuutaVastaukset", payload: luodutVastaukset })
-        return
-      }
-    }
-
-    let vastaukset = []
-
-    //tentti constia käytetään staten luomisessa, joten ei käytetä vielä state.tentit
-    tenttis.forEach(tentti => {
-
-      let tenttiID = tentti.id
-
-      tentti.kysymykset.forEach(kysymys => {
-
-        let vastaus =
-        {
-          tenttiID: tenttiID,
-          kysymysID: undefined,
-          vastaukset: [],
-        }
-
-        vastaus.kysymysID = kysymys.id
-        vastaus.vastaukset = new Array(kysymys.vastausVaihtoehdot.length).fill(false)
-
-        vastaukset.push(vastaus)
-      })
-    });
-
-
-    dispatch({ type: "MuutaVastaukset", payload: vastaukset })
-
-    if (forceFromState) {
-
-    }
-    else {
-      createVastaukset(vastaukset)
-    }
-
-  }
-
 
   const vaihdaKäyttäjää = () => {
     //  let vastaukset = luoVastaukset(state.tentit, true)
@@ -230,6 +214,14 @@ function App() {
 
   const tentit = () => {
 
+  }
+
+  const isLoggedIn = () => {
+    if (state.käyttäjäID === undefined) {
+      return false
+    }
+
+    return true
   }
 
   return (
@@ -244,19 +236,27 @@ function App() {
               <Button onClick={tentit} style={{ color: 'white' }}>Tentit</Button>
               <Button onClick={TarkistaState} style={{ color: 'white' }}>Tarkista State</Button>
               <Button onClick={vaihdaKäyttäjää} style={{ color: 'white' }}>{state.admin ? "Vaihda Normikäyttäjäksi" : "Vaihda Adminiksi"}</Button>
+              <Button onClick={Logout} style={{ color: 'white' }}>{"Kirjaudu Ulos"}</Button>
+
+
 
             </div>
           </div>
 
           <div style={mainContainerStyle}>
-            <div style={tableContainerStyle}>
-              {state.admin ?
-                <VastausListaAdmin />
-                :
-                <VastausLista />
-              }
+            {isLoggedIn() ?
 
-            </div>
+              <div style={tableContainerStyle}>
+                {state.admin ?
+                  <VastausListaAdmin />
+                  :
+                  <VastausLista />
+                }
+
+              </div>
+              :
+              <Login />
+            }
           </div>
         </div>
       }

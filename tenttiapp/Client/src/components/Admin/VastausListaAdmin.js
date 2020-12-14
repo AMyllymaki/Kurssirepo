@@ -9,14 +9,14 @@ import IconButton from '@material-ui/core/IconButton';
 import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
 import DeleteIcon from '@material-ui/icons/Delete';
 
-import { uusiKysymys, uusiKysymysKannasta } from '../kysymysObjekti'
-import { uusiTentti } from '../tenttiObjekti'
-import { uusiVastausvaihtoehto } from '../vastausVaihtoehtoObjekti'
+import { uusiKysymys, uusiKysymysKannasta } from '../ObjektiRakentajat/kysymysObjekti'
+import { uusiTentti } from '../ObjektiRakentajat/tenttiObjekti'
+import { uusiVastausvaihtoehto } from '../ObjektiRakentajat/vastausVaihtoehtoObjekti'
 
 import { poistaTentti, lisääTentti, muokkaaTenttiä } from "../HttpRequests/tenttiRequests.js"
 import { poistaKysymys, lisääKysymys, muokkaaKysymystä } from "../HttpRequests/kysymysRequests.js"
 import { lisääVastausVaihtoehto, poistaVastausVaihtoehto, muokkaaVastausVaihtoehtoa } from "../HttpRequests/vastausVaihtoehtoRequests.js"
-import { lisääKysymysTenttiin, haeTentinKysymykset } from "../HttpRequests/TenttiKysymysRequests.js"
+import { lisääKysymysTenttiin, haeTentinKysymykset } from "../HttpRequests/tenttiKysymysRequests.js"
 
 function VastausListaAdmin() {
 

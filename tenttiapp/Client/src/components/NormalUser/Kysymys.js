@@ -2,9 +2,8 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import { green } from '@material-ui/core/colors';
-import { UserContext } from '../App.js'
+import { UserContext } from '../../App.js'
 import { useContext } from 'react';
-import logo from '../images/selmaStill.png'
 
 
 
@@ -32,14 +31,12 @@ function Kysymys(props) {
 
 
     const { kysymys, vastausVaihtoehdot } = props.kysymys
-    //const vastaukset = props.kysymysVastaukset
-
+ 
     const { state } = useContext(UserContext)
 
     const handleChange = (vaihtoehtoID) => {
 
         let vastaukset = state.vastaukset.filter(vastaus => vastaus.vaihtoehto_id === vaihtoehtoID)
-
 
         if (vastaukset.length === 0) {
 
@@ -51,6 +48,7 @@ function Kysymys(props) {
     }
 
     const checkIfChecked = (vaihtoehtoID) => {
+
         let valinnat = state.vastaukset.filter(vastaus => vastaus.vaihtoehto_id === vaihtoehtoID)
 
         if (valinnat.length === 0) {
@@ -73,8 +71,7 @@ function Kysymys(props) {
 
                             <div key={i} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                                 <Checkbox
-                                    //checked={vastaukset.vastaukset[i]}
-                                    checked={false}
+                                    checked={checkIfChecked(vastausVaihtoehto.id)}
                                     color="primary"
                                     disableRipple={true}
                                     inputProps={{ 'aria-label': 'secondary checkbox' }}

@@ -1,0 +1,17 @@
+Kirjautuessa pitäisi hakea tentit käyttäjälle (Ja logoffissa poistaa)
+Serverille pitäisi tehdä käyttäjäkohtaiset oikeudet
+Serialize ja Deserialize toiminta
+Käyttäjän tarkistus autentikoidessa
+Tarkasta miten expire toimii ja miten siitä voitaisiin infota käyttäjälle
+
+
+Master Admin
+
+Käyttäjien poisto ja adminien lisäys
+
+Admin:
+
+Tenttejä pitäisi pystyä lisäämään käyttäjille
+Kysymyksiä pitisi pystyä lisäämään tentteihin (näkymä jossa on kaikki kysmykset)
+
+
