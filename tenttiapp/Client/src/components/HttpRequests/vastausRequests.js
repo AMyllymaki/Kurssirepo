@@ -24,9 +24,16 @@ export const lisääVastaus = async (vastaus) => {
 
 export const haeKäyttäjänVastauksetTenttiin = async (käyttäjäID, tenttiID) => {
     try {
+
+        console.log("Haetaan käyttäjän vastaukset")
+
         let result = await axios.get(ServerSettings.baseURL + "/vastaus/kayttaja/" + käyttäjäID + "/tentti/" + tenttiID)
 
+
         if (result.statusText === "OK") {
+
+            console.log(result)
+
 
             return result
 

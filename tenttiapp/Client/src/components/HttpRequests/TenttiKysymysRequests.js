@@ -7,7 +7,11 @@ export const haeTentinKysymykset = async (id) => {
     try {
         let result = await axios.get(ServerSettings.baseURL + "/tenttikysymys/" + id)
 
+
         if (result.statusText === "OK") {
+
+            console.log("Tenttikysymys " + id)
+            console.log(result.data)
 
             let kysymykset = result.data
 

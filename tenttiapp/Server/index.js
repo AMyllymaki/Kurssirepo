@@ -1,39 +1,30 @@
 const cors = require('cors')
 
 const express = require('express')
-const session = require('express-session');
 const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt')
-const passport = require('passport')
-var jwt = require('jsonwebtoken');
+
+require('./components/passport.js');
+const routes = require('./routes/routes.js');
+const secureRoutes = require('./routes/secureRoutes.js')
+
+const passport = require('passport');
 
 const app = express()
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 
-app.use(session({ secret: "salaisuus" }));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-
-const LocalStrategy = require('passport-local').Strategy
-
-JWTstrategy = require('passport-jwt').Strategy
-ExtractJWT = require('passport-jwt').ExtractJwt;
-const BCRYPT_SALT_ROUNDS = 12;
 
 app.use(cors())
 const port = 4000
 
+app.use('/', routes);
+app.use('/admin', passport.authenticate('loginToken', { session: false }), secureRoutes);
+
+
 // notice here I'm requiring my database adapter file
 // and not requiring node-postgres directly
 const db = require('./db');
-
-app.use('/kayttaja', function (req, res, next) {
-    console.log('Time:', Date.now())
-    next()
-})
 
 //TODO
 
@@ -48,59 +39,6 @@ app.use('/kayttaja', function (req, res, next) {
 
 
 //TÄN KOODIMÄÄRÄN VOI FIKSAA ROUTEILLA!
-
-{//Käyttäjä queryt
-    app.delete('/kayttaja/:id', (req, res) => {
-        db.query('DELETE FROM käyttäjä WHERE id = $1', [req.params.id], (err, result) => {
-
-            if (err) {
-                console.log(err)
-            }
-            res.send(result)
-        })
-    })
-
-    app.get('/kayttaja/:id', (req, res) => {
-        db.query('SELECT * FROM käyttäjä WHERE id = $1', [req.params.id], (err, result) => {
-
-            if (err) {
-                console.log(err)
-            }
-            res.send(result.rows[0])
-        })
-    })
-
-    app.get('/kayttaja/', (req, res) => {
-        db.query('SELECT * FROM käyttäjä', (err, result) => {
-
-
-            if (err) {
-                console.log(err)
-            }
-            res.send(result.rows)
-        })
-    })
-
-    app.post('/kayttaja/', (req, res) => {
-
-
-        let käyttäjätunnus = req.body.käyttäjätunnus
-        let salasana = req.body.salasana
-        let rooli = req.body.rooli
-
-        let SQLRequest = "INSERT INTO käyttäjä(käyttäjätunnus, salasana, rooli) VALUES ($1,$2,$3)"
-
-        db.query(SQLRequest, [käyttäjätunnus, salasana, rooli], (err, result) => {
-
-            console.log(req.params.id)
-            if (err) {
-                console.log(err)
-                return
-            }
-            res.send(result.rows[0])
-        })
-    })
-}
 
 {//Kurssi queryt
     app.delete('/kurssi/:id', (req, res) => {
@@ -594,149 +532,6 @@ app.use('/kayttaja', function (req, res, next) {
         })
     })
 }
-
-
-passport.serializeUser(function (user, done) {
-
-    done(null, user);
-});
-
-passport.deserializeUser(function (user, done) {
-
-    done(null, user);
-});
-
-app.post('/rekisteroi', (req, res) => {
-    let käyttäjätunnus = req.body.käyttäjätunnus
-
-    try {
-
-        db.query('SELECT id FROM käyttäjä WHERE käyttäjätunnus = $1', [käyttäjätunnus], (err, result) => {
-
-            if (err) {
-                console.log(err)
-            }
-            if (result.rows.length > 0) {
-
-                res.send('username already taken')
-            }
-            else {
-
-                bcrypt.hash(req.body.salasana, BCRYPT_SALT_ROUNDS).then(hashedPassword => {
-
-                    let salasana = hashedPassword
-                    let rooli = "admin"
-
-                    let SQLRequest = "INSERT INTO käyttäjä(käyttäjätunnus, salasana, rooli) VALUES ($1,$2,$3)"
-
-                    db.query(SQLRequest, [käyttäjätunnus, salasana, rooli], (err, result) => {
-
-                        if (err) {
-                            console.log(err)
-                            res.send('Adding User Failed')
-                        }
-                        else {
-                            console.log(result)
-                            res.send('Success')
-                        }
-                    })
-                })
-            }
-        })
-
-    }
-    catch (err) {
-        console.log(err)
-        res.send('Adding User Failed')
-    }
-})
-
-app.post('/login', passport.authenticate('login'), function (req, res) {
-   
-    const user = req.user
-
-    const token = jwt.sign(user, 'salaisuus', {expiresIn: 3600});
-    return res.json({user, token});
-
-})
-
-app.post('/loginToken', passport.authenticate('loginToken'), function (req, res) {
-   
-    const user = req.user
-  
-    const token = jwt.sign({exp: 3600, data: 'data'}, 'salaisuus' );
-
-    res.json({user, token});
-})
-
-passport.use(
-    'login',
-    new LocalStrategy(
-        {
-            usernameField: 'käyttäjätunnus',
-            passwordField: 'salasana',
-            session: false
-        },
-        (username, password, done) => {
-            try {
-
-                db.query('SELECT * FROM käyttäjä WHERE käyttäjätunnus = $1', [username], (err, result) => {
-
-                    if (err) {
-                        console.log(err)
-                    }
-
-                    if (result.rows.length === 0) {
-                        return done(null, false, { message: 'bad username' });
-                    }
-
-                    if (result.rows.length > 0) {
-
-                        let user = result.rows[0]
-
-                        bcrypt.compare(password, user.salasana).then(response => {
-                            if (response !== true) {
-                                console.log('passwords do not match');
-                                return done(null, false, { message: 'passwords do not match' });
-                            }
-
-                            console.log('user found!');
-                            return done(null, user);
-                        })
-                    }
-                });
-            } catch (err) {
-                done(err);
-            }
-        },
-    ),
-);
-
-
-const opts = {
-
-    jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-    secretOrKey: 'salaisuus'
-  };
-
-passport.use(
-    'loginToken',
-    new JWTstrategy(opts, (jwt_payload, done) => {
-       
-        try {
-            //Tässä vois vielä tarkistaa kannasta onko käyttäjä vielä olemassa
-                if (jwt_payload) {
-                    done(null, jwt_payload);
-                } else {
-                    done(null, false);
-                }
-
-        } catch (err) {
-            done(err);
-        }
-    }),
-)
-
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)

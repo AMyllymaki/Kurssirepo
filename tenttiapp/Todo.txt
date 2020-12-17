@@ -1,9 +1,10 @@
 Kirjautuessa pitäisi hakea tentit käyttäjälle (Ja logoffissa poistaa)
 Serverille pitäisi tehdä käyttäjäkohtaiset oikeudet
-Serialize ja Deserialize toiminta
 Käyttäjän tarkistus autentikoidessa
-Tarkasta miten expire toimii ja miten siitä voitaisiin infota käyttäjälle
 
+
+Poista serialize user ja deserialize user
+Katso miksi käyttäjän kysymyksiä ei haeta
 
 Master Admin
 

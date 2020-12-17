@@ -46,9 +46,6 @@ const initialState =
   näytäGraafi: false,
   käyttäjäID: undefined,
   käyttäjäRooli: undefined,
-  username: "",
-  password: "",
-  passwordAgain: "",
 }
 
 const reducer = (state = initialState, action) => {
@@ -101,15 +98,6 @@ const reducer = (state = initialState, action) => {
     case "MuutaKäyttäjäRooli":
       newState.käyttäjäRooli = action.payload
       return newState
-    case "MuutaUsername":
-      newState.username = action.payload
-      return newState
-    case "MuutaPassword":
-      newState.password = action.payload
-      return newState
-    case "MuutaPasswordAgain":
-      newState.passwordAgain = action.payload
-      return newState
     case "KirjauduUlos":
       //Käyttäjällä pitäis olla omat tentit jotka haetaan kirjautuessa
       let tmpTentit = newState.tentit
@@ -148,22 +136,31 @@ function App() {
 
   const LoginWithToken = async (token) => {
 
+  
+    if(token == "null" || token == null)
+    {
+      console.log("token is null")
+      return
+    }
     
     try {
       let LoggedUser = await loginToken(token)
 
-      console.log(LoggedUser)
+      console.log("login with token")
 
-      dispatch({ type: "MuutaPasswordAgain", payload: "" })
-      dispatch({ type: "MuutaPassword", payload: "" })
-      dispatch({ type: "MuutaUsername", payload: "" })
       dispatch({ type: "MuutaKäyttäjäID", payload: LoggedUser.data.user.id })
       dispatch({ type: "MuutaKäyttäjäRooli", payload: LoggedUser.data.user.rooli })
     }
-    catch
+    catch(e)
     {
-      console.log("Error in Token Login")
 
+      if(e.response.status === 401)
+      {
+        localStorage.setItem('jwtToken', null);
+        dispatch({ type: "KirjauduUlos" })
+      }
+
+      console.log("Error in Token Login")
     }
   }
 
@@ -175,7 +172,6 @@ function App() {
   const Logout = () => {
 
     localStorage.setItem('jwtToken', null);
-            
     dispatch({ type: "KirjauduUlos" })
 
   }

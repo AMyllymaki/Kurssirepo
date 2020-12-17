@@ -23,7 +23,6 @@ function VastausLista() {
 
     let lataus = undefined
 
-
     const valitseTentti = (tentti) => {
 
         haeTentinKysymykset(tentti.id).then((kysymykset) => {

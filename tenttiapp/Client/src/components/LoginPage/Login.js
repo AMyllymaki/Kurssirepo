@@ -16,54 +16,42 @@ function Login() {
 
         let credentials =
         {
-            käyttäjätunnus: state.username,
-            salasana: state.password,
+            käyttäjätunnus: username,
+            salasana: password,
         }
 
         try {
             let LoggedUser = await loginUsername(credentials)
 
-         
-           localStorage.setItem('jwtToken', LoggedUser.data.token);
-            
-            dispatch({ type: "MuutaPasswordAgain", payload: "" })
-            dispatch({ type: "MuutaPassword", payload: "" })
-            dispatch({ type: "MuutaUsername", payload: "" })
+            console.log(LoggedUser)
+
+            localStorage.setItem('jwtToken', LoggedUser.data.token);
+
             dispatch({ type: "MuutaKäyttäjäID", payload: LoggedUser.data.user.id })
             dispatch({ type: "MuutaKäyttäjäRooli", payload: LoggedUser.data.user.rooli })
-            
-         
-           
-         
-     
+
         }
-        catch(e)
-        {
+        catch (e) {
             console.log(e)
         }
     }
 
     const RegisterUser = async () => {
 
-        if (state.password !== state.passwordAgain) {
+        if (password !== passwordAgain) {
             console.log("eri salasanat")
             return
         }
 
         let credentials =
         {
-            käyttäjätunnus: state.username,
-            salasana: state.password,
+            käyttäjätunnus: username,
+            salasana: password,
         }
 
         try {
             await registerUser(credentials)
 
-            console.log("Tili luotu!")
-            dispatch({ type: "MuutaPasswordAgain", payload: "" })
-            dispatch({ type: "MuutaPassword", payload: "" })
-            dispatch({ type: "MuutaUsername", payload: "" })
-            updateTextfields()
             setIsLogin(!isLogin)
         }
         catch
@@ -72,30 +60,21 @@ function Login() {
         }
     }
 
-    //Textfields need a changing key if the value is changed outside the component
-    //The key needs to be new unique one every time
-    const updateTextfields = () => {
-
-        let newTextfieldKeys = textFieldKeys
-
-        
-        for (let i = 0; i < newTextfieldKeys.length; i++) {
-            newTextfieldKeys[i] = newTextfieldKeys[i] + 5
-        }
-
-        setTextFieldKeys(newTextfieldKeys)
-    }
+   
 
     const changeLoginType = () => {
 
         dispatch({ type: "MuutaPassword", payload: "" })
         dispatch({ type: "MuutaPasswordAgain", payload: "" })
         setIsLogin(!isLogin)
-        updateTextfields()
+       
     }
 
     const [isLogin, setIsLogin] = useState(true)
-    const [textFieldKeys, setTextFieldKeys] = useState([0, 1, 2, 3, 4])
+    const [username, setUsername] = useState("")
+    const [password, setPassword] = useState("")
+    const [passwordAgain, setPasswordAgain] = useState("")
+
     const { state, dispatch } = useContext(UserContext)
 
 
@@ -106,22 +85,22 @@ function Login() {
                 <h1>Kirjautuminen</h1>
 
                 <TextField
-                    key={textFieldKeys[0]}
+                
                     style={{ height: 65 }}
-                    text={state.username}
+                    text={username}
                     variant="outlined"
                     label="Käyttäjätunnus"
-                    onChange={(e) => dispatch({ type: "MuutaUsername", payload: e.target.value })} />
+                    onChange={(e) => setUsername(e.target.value) }/>
 
 
                 <TextField
-                    key={textFieldKeys[1]}
+          
                     style={{ height: 65 }}
-                    text={state.password}
+                    text={password}
                     variant="outlined"
                     type="password"
                     label="Salasana"
-                    onChange={(e) => dispatch({ type: "MuutaPassword", payload: e.target.value })} />
+                    onChange={(e) => setPassword(e.target.value) }/>
 
 
             </div>
@@ -130,32 +109,32 @@ function Login() {
                 <h1>Tilin luonti</h1>
 
                 <TextField
-                    key={textFieldKeys[2]}
+              
                     style={{ height: 65 }}
                     label={"Käyttäjätunnus"}
-                    text={state.username}
+                    text={username}
                     variant="outlined"
-                    onChange={(e) => dispatch({ type: "MuutaUsername", payload: e.target.value })} />
+                    onChange={(e) => setUsername(e.target.value) } />
 
 
 
                 <TextField
-                    key={textFieldKeys[3]}
+            
                     style={{ height: 65 }}
                     label={"Salasana"}
-                    text={state.password}
+                    text={password}
                     type="password"
                     variant="outlined"
-                    onChange={(e) => dispatch({ type: "MuutaPassword", payload: e.target.value })} />
+                    onChange={(e) => setPassword(e.target.value) } />
 
                 <TextField
-                    key={textFieldKeys[4]}
+    
                     style={{ height: 65 }}
                     label={"Salasana uudestaan"}
-                    text={state.passwordAgain}
+                    text={passwordAgain}
                     type="password"
                     variant="outlined"
-                    onChange={(e) => dispatch({ type: "MuutaPasswordAgain", payload: e.target.value })} />
+                    onChange={(e) => setPasswordAgain(e.target.value) } />
 
 
             </div>
