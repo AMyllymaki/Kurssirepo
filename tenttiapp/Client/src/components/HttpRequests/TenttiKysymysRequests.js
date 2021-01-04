@@ -2,10 +2,14 @@ import ServerSettings from '../../ServerSettings.js'
 import axios from 'axios';
 import { haeVastausVaihtoehdotJaLiitäKysymykseen } from "./vastausVaihtoehtoRequests.js"
 
-
 export const haeTentinKysymykset = async (id) => {
+
+    const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
+    };
+
     try {
-        let result = await axios.get(ServerSettings.baseURL + "/tenttikysymys/" + id)
+        let result = await axios.get(ServerSettings.baseURL + "/authenticated" + "/tenttikysymys/" + id, config)
 
 
         if (result.statusText === "OK") {
@@ -32,6 +36,10 @@ export const haeTentinKysymykset = async (id) => {
 export const lisääKysymysTenttiin = async (tenttiID, kysymysID) => {
 
 
+    const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
+    };
+
     let tenttikysymysID =
     {
         tentti_id: tenttiID,
@@ -40,7 +48,7 @@ export const lisääKysymysTenttiin = async (tenttiID, kysymysID) => {
 
     try {
 
-        const result = await axios.post(ServerSettings.baseURL + "/tenttikysymys/", tenttikysymysID)
+        const result = await axios.post(ServerSettings.baseURL + "/authenticated" + "/tenttikysymys/", tenttikysymysID, config)
 
         if (result.statusText === "OK") {
 

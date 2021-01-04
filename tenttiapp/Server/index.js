@@ -19,7 +19,7 @@ app.use(cors())
 const port = 4000
 
 app.use('/', routes);
-app.use('/admin', passport.authenticate('loginToken', { session: false }), secureRoutes);
+app.use('/authenticated', passport.authenticate('loginToken', { session: false }), secureRoutes);
 
 
 // notice here I'm requiring my database adapter file
@@ -90,157 +90,9 @@ const db = require('./db');
     })
 }
 
-{//Tentti queryt
-    app.delete('/tentti/:id', (req, res) => {
-        db.query('DELETE FROM tentti WHERE id = $1', [req.params.id], (err, result) => {
-
-            if (err) {
-                console.log(err)
-            }
-            res.send(result)
-        })
-    })
-
-    app.get('/tentti/:id', (req, res) => {
-        db.query('SELECT * FROM tentti WHERE id = $1', [req.params.id], (err, result) => {
-
-            console.log(req.params.id)
-            if (err) {
-                console.log(err)
-            }
-            res.send(result.rows[0])
-        })
-    })
-
-    app.get('/tentti/', (req, res) => {
-        db.query('SELECT * FROM tentti', (err, result) => {
 
 
-            if (err) {
-                console.log(err)
-            }
-            res.send(result.rows)
-        })
-    })
 
-    app.put('/tentti/:id', (req, res) => {
-
-        let nimi = req.body.nimi
-        let minimipisteet = req.body.minimipisteet
-        let SQLRequest = "UPDATE tentti SET nimi=$2, minimipisteet=$3 WHERE id = $1"
-
-        db.query(SQLRequest, [req.params.id, nimi, minimipisteet], (err, result) => {
-
-            if (err) {
-                console.log(err)
-                return
-            }
-            res.send(result.rows[0])
-        })
-
-
-    })
-
-    //Julkaise tentti
-    app.put('/julkaise/tentti/:id', (req, res) => {
-
-        let SQLRequest = "UPDATE tentti SET julkaisuajankohta=now() WHERE id = $1"
-
-        db.query(SQLRequest, [req.params.id], (err, result) => {
-
-            if (err) {
-                console.log(err)
-                return
-            }
-            res.send(result.rows[0])
-        })
-    })
-
-    app.post('/tentti/', (req, res) => {
-
-        let nimi = req.body.nimi
-        let minimipisteet = req.body.minimipisteet
-        let SQLRequest = "INSERT INTO tentti(nimi, minimipisteet) VALUES ($1, $2) RETURNING id"
-
-        db.query(SQLRequest, [nimi, minimipisteet], (err, result) => {
-
-            if (err) {
-                console.log(err)
-                return
-            }
-
-            res.send(result.rows[0].id)
-        })
-    })
-}
-
-{//Kysymys queryt
-    app.delete('/kysymys/:id', (req, res) => {
-        db.query('DELETE FROM kysymys WHERE id = $1', [req.params.id], (err, result) => {
-
-            console.log(req.params.id)
-            if (err) {
-                console.log(err)
-            }
-            res.send(result)
-        })
-    })
-
-    app.get('/kysymys/:id', (req, res) => {
-        db.query('SELECT * FROM kysymys WHERE id = $1', [req.params.id], (err, result) => {
-
-            console.log(req.params.id)
-            if (err) {
-                console.log(err)
-            }
-            res.send(result.rows[0])
-        })
-    })
-
-    app.get('/kysymys/', (req, res) => {
-        db.query('SELECT * FROM kysymys', (err, result) => {
-
-            if (err) {
-                console.log(err)
-            }
-            res.send(result.rows)
-        })
-    })
-
-    app.post('/kysymys/', (req, res) => {
-
-        let kysymys = req.body.kysymys
-        let aihe_id = req.body.aihe_id
-        let SQLRequest = "INSERT INTO kysymys(kysymys, aihe_id) VALUES ($1, $2) RETURNING id"
-
-        db.query(SQLRequest, [kysymys, aihe_id], (err, result) => {
-
-            console.log(req.params.id)
-            if (err) {
-                console.log(err)
-                return
-            }
-            res.send(result.rows[0].id)
-        })
-    })
-
-    app.put('/kysymys/:id', (req, res) => {
-
-        let kysymys = req.body.kysymys
-        let aihe_id = req.body.aihe_id
-        let SQLRequest = "UPDATE kysymys SET kysymys=$1, aihe_id=$2 WHERE id=$3"
-
-        db.query(SQLRequest, [kysymys, aihe_id, req.params.id], (err, result) => {
-
-            console.log(req.params.id)
-            if (err) {
-                console.log(err)
-                return
-            }
-            res.send(result.rows[0])
-        })
-    })
-}
 
 {//Aihe queryt
     app.delete('/aihe/:id', (req, res) => {
@@ -330,7 +182,7 @@ const db = require('./db');
     })
 
     app.get('/vastausvaihtoehto/', (req, res) => {
-        db.query('SELECT * FROM vastausvaihtoehto', (err, result) => {
+        db.query('SELECT * FROM vastausvaihtoehto ORDER BY id', (err, result) => {
 
             console.log(req.params.id)
             if (err) {
@@ -341,7 +193,7 @@ const db = require('./db');
     })
 
     app.get('/vastausvaihtoehto/kysymys/:id', (req, res) => {
-        db.query('SELECT * FROM vastausvaihtoehto WHERE kysymys_id =$1', [req.params.id], (err, result) => {
+        db.query('SELECT * FROM vastausvaihtoehto WHERE kysymys_id =$1 ORDER BY id', [req.params.id], (err, result) => {
 
             console.log(req.params.id)
             if (err) {
@@ -475,63 +327,7 @@ const db = require('./db');
     })
 }
 
-{//Tenttikysymys queryt
 
-    app.delete('/tenttikysymys/:idtentti/kysymys/:idkysymys', (req, res) => {
-        db.query('DELETE FROM tenttikysymys WHERE tentti_id = $1 AND kysymys_id = $2', [req.params.idtentti, req.params.idkysymys], (err, result) => {
-
-            if (err) {
-                console.log(err)
-            }
-            res.send(result)
-        })
-    })
-
-    //Hakee yhden tentin kaikki kysymykset
-    app.get('/tenttikysymys/:idtentti', (req, res) => {
-
-
-        db.query('SELECT * FROM kysymys WHERE id IN (SELECT kysymys_id FROM tenttikysymys WHERE tentti_id = $1)', [req.params.idtentti], (err, result) => {
-
-            if (err) {
-                console.log(err)
-            }
-            res.send(result.rows)
-
-        })
-    })
-
-    //Hakee yhden kysymyksen kaikki tentit
-    app.get('/kysymystentti/:idkysymys', (req, res) => {
-        db.query('SELECT tentti_id FROM tenttikysymys WHERE kysymys_id = $1', [req.params.idkysymys], (err, result) => {
-
-            if (err) {
-                console.log(err)
-            }
-            res.send(result.rows)
-        })
-    })
-
-    app.post('/tenttikysymys/', (req, res) => {
-
-        console.log(req.body)
-
-        let tentti_id = req.body.tentti_id
-        let kysymys_id = req.body.kysymys_id
-
-        let SQLRequest = "INSERT INTO tenttikysymys(tentti_id, kysymys_id) VALUES ($1, $2)"
-
-        db.query(SQLRequest, [tentti_id, kysymys_id], (err, result) => {
-
-            console.log(req.params.id)
-            if (err) {
-                console.log(err)
-                return
-            }
-            res.send(result.rows[0])
-        })
-    })
-}
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)

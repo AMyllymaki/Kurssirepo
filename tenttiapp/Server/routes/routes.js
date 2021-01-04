@@ -19,15 +19,15 @@ router.post('/rekisteroi', (req, res) => {
                 console.log(err)
             }
             if (result.rows.length > 0) {
-
-                res.send('username already taken')
+                res.status(400)
+                res.send('Registeration Failed')
             }
             else {
 
                 bcrypt.hash(req.body.salasana, BCRYPT_SALT_ROUNDS).then(hashedPassword => {
 
                     let salasana = hashedPassword
-                    let rooli = "admin"
+                    let rooli = "normal"
 
                     let SQLRequest = "INSERT INTO käyttäjä(käyttäjätunnus, salasana, rooli) VALUES ($1,$2,$3)"
 
@@ -69,7 +69,7 @@ router.post('/login',
                         return res.send("Unauthorized")
                     }
                     
-                    const user = { id: userFromDB.id, rooli: userFromDB.rooli };
+                    const user = { id: userFromDB.id, rooli: userFromDB.rooli, käyttäjätunnus: userFromDB.käyttäjätunnus };
                     const token = jwt.sign({ user: user }, 'secrets');
                     return res.json({ user, token });
 
@@ -91,14 +91,5 @@ router.post('/login',
         )(req, res, next);
     }
 )
-
-router.post('/loginToken', passport.authenticate('loginToken'), function (req, res) {
-
-    const user = req.session.passport.user
-
-    res.json({ user });
-})
-
-
 
 module.exports = router;

@@ -1,6 +1,7 @@
 import ServerSettings from '../../ServerSettings.js'
 import axios from 'axios';
 
+
 export const loginUsername = async (credentials) => {
   
     try {
@@ -33,7 +34,7 @@ export const loginToken = async (token) => {
      console.log(config)
   
     try {
-        let result = await axios.post(ServerSettings.baseURL + "/loginToken/", bodyParameters, config)
+        let result = await axios.post(ServerSettings.baseURL + "/authenticated" + "/loginToken/", bodyParameters, config)
 
         if (result.statusText === "OK") {
 

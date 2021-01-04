@@ -1,6 +1,6 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-  
+
 const JWTstrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
 const bcrypt = require('bcrypt')
@@ -59,13 +59,33 @@ passport.use(
     'loginToken',
     new JWTstrategy(opts, (jwt_payload, done) => {
 
-        console.log(jwt_payload)
-
         try {
-            //Tässä vois vielä tarkistaa kannasta onko käyttäjä vielä olemassa
+
             if (jwt_payload) {
-                done(null, jwt_payload);
-            } else {
+
+                db.query('SELECT * FROM käyttäjä WHERE id = $1', [jwt_payload.user.id], (err, result) => {
+
+                    if (err) {
+                        console.log(err)
+                        done(null, false);
+                    }
+
+                    if (result.rows.length === 0) {
+
+                        return done(null, false, { message: "user doesn't exist" });
+                    }
+
+                    if (result.rows.length > 0) {
+
+                        let user = result.rows[0]
+
+                        if (user) {
+                            done(null, user);
+                        }
+                    }
+                })
+            }
+            else {
                 done(null, false);
             }
 

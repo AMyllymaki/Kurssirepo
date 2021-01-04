@@ -2,10 +2,17 @@ import ServerSettings from '../../ServerSettings.js'
 import axios from 'axios';
 
 export const haeTentit = async () => {
+
+    const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
+    };
+
     try {
-        let result = await axios.get(ServerSettings.baseURL + "/tentti/")
+        let result = await axios.get(ServerSettings.baseURL + "/authenticated" + "/tentti/", config)
 
         if (result.statusText === "OK") {
+
+            console.log("Tentit haettu")
 
             return result
 
@@ -22,10 +29,13 @@ export const haeTentit = async () => {
 //Palauttaa uuden komponenti ID:n
 export const lisääTentti = async (tentti) => {
 
+    const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
+    };
   
     try {
 
-        const result = await axios.post(ServerSettings.baseURL + "/tentti/", tentti)
+        const result = await axios.post(ServerSettings.baseURL + "/authenticated" + "/tentti/", tentti, config)
 
         if (result.statusText === "OK") {
 
@@ -44,8 +54,13 @@ export const lisääTentti = async (tentti) => {
 
 
 export const poistaTentti = async (id) => {
+
+    const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
+    };
+
     try {
-        let result = await axios.delete(ServerSettings.baseURL + "/tentti/" + id)
+        let result = await axios.delete(ServerSettings.baseURL + "/authenticated"  + "/tentti/" + id, config)
 
    
         if (result.statusText === "OK") {
@@ -63,8 +78,13 @@ export const poistaTentti = async (id) => {
 }
 
 export const muokkaaTenttiä = async (id, tentti) => {
+
+    const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
+    };
+
     try {
-        let result = await axios.put(ServerSettings.baseURL + "/tentti/" + id, tentti)
+        let result = await axios.put(ServerSettings.baseURL + "/authenticated"  + "/tentti/" + id, tentti, config)
 
       
         if (result.statusText === "OK") {
@@ -82,8 +102,17 @@ export const muokkaaTenttiä = async (id, tentti) => {
 }
 
 export const julkaiseTentti = async (id) => {
+
+    const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem('jwtToken')}` }
+    };
+
+    const bodyParameters = {
+    };
+
+
     try {
-        let result = await axios.put(ServerSettings.baseURL + "/julkaise/tentti/" + id)
+        let result = await axios.put(ServerSettings.baseURL + "/authenticated"  + "/julkaise/tentti/" + id, bodyParameters, config)
 
         if (result.data.length > 0) {
 

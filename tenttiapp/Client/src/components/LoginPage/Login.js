@@ -5,7 +5,8 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { loginUsername } from '../HttpRequests/loginRequests.js'
 import { registerUser } from '../HttpRequests/registerRequests.js'
-
+import Swal from 'sweetalert2'
+import { LoginSuccess } from '../SweetAlerts.js'
 
 
 
@@ -23,25 +24,55 @@ function Login() {
         try {
             let LoggedUser = await loginUsername(credentials)
 
-            console.log(LoggedUser)
-
             localStorage.setItem('jwtToken', LoggedUser.data.token);
+            
+            LoginSuccess(credentials.käyttäjätunnus)
 
             dispatch({ type: "MuutaKäyttäjäID", payload: LoggedUser.data.user.id })
             dispatch({ type: "MuutaKäyttäjäRooli", payload: LoggedUser.data.user.rooli })
 
         }
         catch (e) {
+
             console.log(e)
+
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'error',
+                title: 'Kirjautuminen epäonnistui'
+            })
         }
     }
 
     const RegisterUser = async () => {
 
-        if (password !== passwordAgain) {
-            console.log("eri salasanat")
+        if (username === "") {
+            Swal.fire('Tyhjä käyttäjätunnus', 'Valitse itsellesi käyttäjätunnus', 'error')
             return
         }
+
+        if (password === "") {
+            Swal.fire('Tyhjä salasana', 'Valitse itsellesi salasana', 'error')
+            return
+        }
+
+        if (password !== passwordAgain) {
+            Swal.fire('Salasanat eivät täsmää', 'Kirjoita molempiin salasanakenttiin sama salasana', 'error')
+            return
+        }
+
+      
 
         let credentials =
         {
@@ -52,22 +83,48 @@ function Login() {
         try {
             await registerUser(credentials)
 
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: 'Rekisteröinti onnistui!'
+            })
+
             setIsLogin(!isLogin)
         }
         catch
         {
 
+            Swal.fire({
+                position: 'center',
+                icon: 'error',
+                title: 'Rekisteröinti ei onnistunut',
+                showConfirmButton: false,
+                timer: 2500
+            })
+
+            return
         }
     }
 
-   
+
 
     const changeLoginType = () => {
 
         dispatch({ type: "MuutaPassword", payload: "" })
         dispatch({ type: "MuutaPasswordAgain", payload: "" })
         setIsLogin(!isLogin)
-       
+
     }
 
     const [isLogin, setIsLogin] = useState(true)
@@ -85,22 +142,22 @@ function Login() {
                 <h1>Kirjautuminen</h1>
 
                 <TextField
-                
+
                     style={{ height: 65 }}
                     text={username}
                     variant="outlined"
                     label="Käyttäjätunnus"
-                    onChange={(e) => setUsername(e.target.value) }/>
+                    onChange={(e) => setUsername(e.target.value)} />
 
 
                 <TextField
-          
+
                     style={{ height: 65 }}
                     text={password}
                     variant="outlined"
                     type="password"
                     label="Salasana"
-                    onChange={(e) => setPassword(e.target.value) }/>
+                    onChange={(e) => setPassword(e.target.value)} />
 
 
             </div>
@@ -109,32 +166,32 @@ function Login() {
                 <h1>Tilin luonti</h1>
 
                 <TextField
-              
+
                     style={{ height: 65 }}
                     label={"Käyttäjätunnus"}
                     text={username}
                     variant="outlined"
-                    onChange={(e) => setUsername(e.target.value) } />
+                    onChange={(e) => setUsername(e.target.value)} />
 
 
 
                 <TextField
-            
+
                     style={{ height: 65 }}
                     label={"Salasana"}
                     text={password}
                     type="password"
                     variant="outlined"
-                    onChange={(e) => setPassword(e.target.value) } />
+                    onChange={(e) => setPassword(e.target.value)} />
 
                 <TextField
-    
+
                     style={{ height: 65 }}
                     label={"Salasana uudestaan"}
                     text={passwordAgain}
                     type="password"
                     variant="outlined"
-                    onChange={(e) => setPasswordAgain(e.target.value) } />
+                    onChange={(e) => setPasswordAgain(e.target.value)} />
 
 
             </div>

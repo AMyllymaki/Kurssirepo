@@ -6,6 +6,10 @@ import VastausListaAdmin from './components/Admin/VastausListaAdmin'
 import { haeTentit } from "./components/HttpRequests/tenttiRequests.js"
 import Login from "./components/LoginPage/Login.js"
 import { loginToken } from "./components/HttpRequests/loginRequests.js"
+import { LoginSuccess } from './components/SweetAlerts.js'
+
+
+
 
 const mainContainerStyle =
 {
@@ -146,14 +150,16 @@ function App() {
     try {
       let LoggedUser = await loginToken(token)
 
-      console.log("login with token")
+      console.log(LoggedUser)
 
-      dispatch({ type: "MuutaKäyttäjäID", payload: LoggedUser.data.user.id })
-      dispatch({ type: "MuutaKäyttäjäRooli", payload: LoggedUser.data.user.rooli })
+      LoginSuccess(LoggedUser.data.User.käyttäjätunnus )
+
+      dispatch({ type: "MuutaKäyttäjäID", payload: LoggedUser.data.User.id })
+      dispatch({ type: "MuutaKäyttäjäRooli", payload:  LoggedUser.data.User.rooli })
     }
     catch(e)
     {
-
+    
       if(e.response.status === 401)
       {
         localStorage.setItem('jwtToken', null);
