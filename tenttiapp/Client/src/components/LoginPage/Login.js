@@ -25,7 +25,7 @@ function Login() {
             let LoggedUser = await loginUsername(credentials)
 
             localStorage.setItem('jwtToken', LoggedUser.data.token);
-            
+
             LoginSuccess(credentials.käyttäjätunnus)
 
             dispatch({ type: "MuutaKäyttäjäID", payload: LoggedUser.data.user.id })
@@ -72,7 +72,7 @@ function Login() {
             return
         }
 
-      
+
 
         let credentials =
         {
@@ -143,6 +143,8 @@ function Login() {
 
                 <TextField
 
+                    name="username_field"
+
                     style={{ height: 65 }}
                     text={username}
                     variant="outlined"
@@ -152,6 +154,7 @@ function Login() {
 
                 <TextField
 
+                    name="password_field"
                     style={{ height: 65 }}
                     text={password}
                     variant="outlined"
@@ -201,7 +204,7 @@ function Login() {
         <div style={{ display: "flex", flexDirection: "row", width: '50%', paddingTop: 30, justifyContent: 'flex-end' }}>
             <Button style={{ marginRight: 5 }} color="primary" variant="contained" onClick={changeLoginType}>{isLogin ? "Uusi tili" : "Takaisin kirjautumiseen"}</Button>
             {isLogin ?
-                <Button color="primary" variant="contained" onClick={LoginWithUsername}>Kirjaudu</Button>
+                <Button name="login_button" color="primary" variant="contained" onClick={LoginWithUsername}>Kirjaudu</Button>
                 :
                 <Button color="primary" variant="contained" onClick={RegisterUser}>Luo tili</Button>
             }

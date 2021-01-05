@@ -217,7 +217,7 @@ router.post('/loginToken', function (req, res) {
 }
 
 {//Kysymys queryt
-    app.delete('/kysymys/:id',CheckIfAdmin, (req, res) => {
+    router.delete('/kysymys/:id',CheckIfAdmin, (req, res) => {
         db.query('DELETE FROM kysymys WHERE id = $1', [req.params.id], (err, result) => {
 
             console.log(req.params.id)
@@ -228,7 +228,7 @@ router.post('/loginToken', function (req, res) {
         })
     })
 
-    app.get('/kysymys/:id', (req, res) => {
+    router.get('/kysymys/:id', (req, res) => {
         db.query('SELECT * FROM kysymys WHERE id = $1', [req.params.id], (err, result) => {
 
             console.log(req.params.id)
@@ -239,7 +239,7 @@ router.post('/loginToken', function (req, res) {
         })
     })
 
-    app.get('/kysymys/', (req, res) => {
+    router.get('/kysymys/', (req, res) => {
         db.query('SELECT * FROM kysymys', (err, result) => {
 
             if (err) {
@@ -249,7 +249,7 @@ router.post('/loginToken', function (req, res) {
         })
     })
 
-    app.post('/kysymys/', CheckIfAdmin, (req, res) => {
+    router.post('/kysymys/', CheckIfAdmin, (req, res) => {
 
         let kysymys = req.body.kysymys
         let aihe_id = req.body.aihe_id
@@ -266,7 +266,7 @@ router.post('/loginToken', function (req, res) {
         })
     })
 
-    app.put('/kysymys/:id', (req, res) => {
+    router.put('/kysymys/:id', (req, res) => {
 
         let kysymys = req.body.kysymys
         let aihe_id = req.body.aihe_id

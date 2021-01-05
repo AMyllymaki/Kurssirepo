@@ -45,7 +45,7 @@ const initialState =
   valittuTenttiIndex: undefined,
   vastaukset: [],
   loading: false,
-  tentit: undefined,
+  tentit: [],
   admin: false,
   näytäGraafi: false,
   käyttäjäID: undefined,
@@ -122,21 +122,26 @@ function App() {
 
   useEffect(() => {
 
-    luoTentit().then((response) => {
-      if (response !== undefined) {
+     LoginWithToken(localStorage.getItem('jwtToken'))
 
+  }, [])
+
+  useEffect(() => 
+  {
+    if(state.käyttäjäID === undefined)
+    {
+      return
+    }
+
+    luoTentit(localStorage.getItem('jwtToken')).then((response) => {
+      if (response !== undefined) {
 
         //luoVastaukset(response)
         dispatch({ type: "LuoTentit", payload: response })
 
       }
     })
-
-    LoginWithToken(localStorage.getItem('jwtToken'))
-
-
-  }, [])
-
+  }, [state.käyttäjäID])
 
   const LoginWithToken = async (token) => {
 
@@ -144,7 +149,7 @@ function App() {
     if(token == "null" || token == null)
     {
       console.log("token is null")
-      return
+      return false
     }
     
     try {
@@ -156,17 +161,25 @@ function App() {
 
       dispatch({ type: "MuutaKäyttäjäID", payload: LoggedUser.data.User.id })
       dispatch({ type: "MuutaKäyttäjäRooli", payload:  LoggedUser.data.User.rooli })
+      return LoggedUser
     }
     catch(e)
     {
     
+      if(e.response === undefined)
+      {
+        console.log("No response from the server")
+        return false
+      }
+     
+
       if(e.response.status === 401)
       {
         localStorage.setItem('jwtToken', null);
         dispatch({ type: "KirjauduUlos" })
       }
 
-      console.log("Error in Token Login")
+      return false
     }
   }
 
@@ -182,8 +195,12 @@ function App() {
 
   }
 
-  const luoTentit = async () => {
+  const luoTentit = async (LoggedToken) => {
 
+
+    console.log("LoggedToken")
+    console.log(LoggedToken)
+    
     let luodutTentit = await haeTentit().then((response) => {
 
       if (response.data !== undefined) {
@@ -229,9 +246,6 @@ function App() {
   return (
 
     <UserContext.Provider value={{ state, dispatch }}>
-      {state.tentit === undefined ?
-        []
-        :
         <div>
           <div style={{ backgroundColor: '#3F51B5' }}>
             <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
@@ -261,8 +275,6 @@ function App() {
             }
           </div>
         </div>
-      }
-
     </UserContext.Provider>
 
   );
