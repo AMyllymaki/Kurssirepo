@@ -13,11 +13,10 @@ function KysymysMuokattava(props) {
 
     const { kysymys, vastausVaihtoehdot, oikeatVastaukset } = props.kysymys
 
-    const checkboxClicked = (e, i) =>
-    {
+    const checkboxClicked = (e, i) => {
         props.handleInputChange(e.target.checked, props.tenttiID, props.kysymysID, i, true)
     }
-    
+
     const muutaKysymyksenKuvaus = (e) => {
         props.handleInputChange(e.target.value, props.tenttiID, props.kysymysID)
     }
@@ -34,11 +33,36 @@ function KysymysMuokattava(props) {
         props.handleDelete(props.tenttiID, props.kysymysID)
     }
 
-    const handleLisäys = () =>
-    {
+    const handleLisäys = () => {
         props.handleAdding(props.tenttiID, props.kysymysID)
     }
 
+    //Testausta varten
+    const haeKysymysKomponentinNimi = (kysymysNimi, i) => {
+
+      
+        if (kysymysNimi === "Kysymyksen kuvaus" || kysymysNimi === undefined) {
+        
+            return "tyhjä_kysymys"
+        }
+
+        let paluuarvo = "kysymys" + i
+
+        return paluuarvo
+    }
+
+    //Testausta varten
+    const haeVastausvaihtoehtoKomponentinNimi = (vastausVaihtoehtoNimi, i) => {
+
+        if (vastausVaihtoehtoNimi === "") {
+
+            return "tyhjä_vastausvaihtoehto"
+        }
+
+        let paluuarvo = "vastausvaihtoehto" + i
+
+        return paluuarvo
+    }
 
     return (
 
@@ -48,6 +72,7 @@ function KysymysMuokattava(props) {
 
                 <div style={{ width: '100%' }}>
                     <TextField
+                        name={haeKysymysKomponentinNimi(kysymys, props.kysymysnro)}
                         fullWidth
                         label={kysymys}
                         variant="outlined"
@@ -62,10 +87,11 @@ function KysymysMuokattava(props) {
                         <div key={i} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
                             <Checkbox
                                 checked={vastausVaihtoehto.oikea_vastaus}
-                                onChange={(e) => checkboxClicked(e,vastausVaihtoehto.id)}
+                                onChange={(e) => checkboxClicked(e, vastausVaihtoehto.id)}
                                 inputProps={{ 'aria-label': 'primary checkbox' }}
                             />
                             <TextField
+                                name={haeVastausvaihtoehtoKomponentinNimi(vastausVaihtoehto.vaihtoehto, i)}
                                 fullWidth
                                 label={vastausVaihtoehto.vaihtoehto}
                                 variant="outlined"
@@ -77,8 +103,8 @@ function KysymysMuokattava(props) {
                         </div>)}
 
                     <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <IconButton   onClick={() => handleLisäys()} >
-                            <AddCircleRoundedIcon/>
+                        <IconButton name={"LisääVastausvaihtoehto"} onClick={() => handleLisäys()} >
+                            <AddCircleRoundedIcon />
                         </IconButton>
                     </div>
                 </div>

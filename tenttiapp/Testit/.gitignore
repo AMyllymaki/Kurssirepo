@@ -3,3 +3,5 @@ output.xml
 report.html
 debug.log
 chromedriver.exe
+geckodriver.exe
+*.png

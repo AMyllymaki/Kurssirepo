@@ -50,6 +50,10 @@ const initialState =
   näytäGraafi: false,
   käyttäjäID: undefined,
   käyttäjäRooli: undefined,
+
+  //Pitää sisällään tässä sessiossa luotujen tenttien ID:t ja nimet näiden tenttien UI komponenteille
+  testausTentit: [],
+
 }
 
 const reducer = (state = initialState, action) => {
@@ -102,6 +106,9 @@ const reducer = (state = initialState, action) => {
     case "MuutaKäyttäjäRooli":
       newState.käyttäjäRooli = action.payload
       return newState
+    case "LisääTestausTentti":
+      newState.testausTentit = action.payload
+      return newState
     case "KirjauduUlos":
       //Käyttäjällä pitäis olla omat tentit jotka haetaan kirjautuessa
       let tmpTentit = newState.tentit
@@ -122,14 +129,12 @@ function App() {
 
   useEffect(() => {
 
-     LoginWithToken(localStorage.getItem('jwtToken'))
+    LoginWithToken(localStorage.getItem('jwtToken'))
 
   }, [])
 
-  useEffect(() => 
-  {
-    if(state.käyttäjäID === undefined)
-    {
+  useEffect(() => {
+    if (state.käyttäjäID === undefined) {
       return
     }
 
@@ -145,36 +150,32 @@ function App() {
 
   const LoginWithToken = async (token) => {
 
-  
-    if(token == "null" || token == null)
-    {
+
+    if (token == "null" || token == null) {
       console.log("token is null")
       return false
     }
-    
+
     try {
       let LoggedUser = await loginToken(token)
 
       console.log(LoggedUser)
 
-      LoginSuccess(LoggedUser.data.User.käyttäjätunnus )
+      LoginSuccess(LoggedUser.data.User.käyttäjätunnus)
 
       dispatch({ type: "MuutaKäyttäjäID", payload: LoggedUser.data.User.id })
-      dispatch({ type: "MuutaKäyttäjäRooli", payload:  LoggedUser.data.User.rooli })
+      dispatch({ type: "MuutaKäyttäjäRooli", payload: LoggedUser.data.User.rooli })
       return LoggedUser
     }
-    catch(e)
-    {
-    
-      if(e.response === undefined)
-      {
+    catch (e) {
+
+      if (e.response === undefined) {
         console.log("No response from the server")
         return false
       }
-     
 
-      if(e.response.status === 401)
-      {
+
+      if (e.response.status === 401) {
         localStorage.setItem('jwtToken', null);
         dispatch({ type: "KirjauduUlos" })
       }
@@ -200,7 +201,7 @@ function App() {
 
     console.log("LoggedToken")
     console.log(LoggedToken)
-    
+
     let luodutTentit = await haeTentit().then((response) => {
 
       if (response.data !== undefined) {
@@ -246,35 +247,42 @@ function App() {
   return (
 
     <UserContext.Provider value={{ state, dispatch }}>
-        <div>
-          <div style={{ backgroundColor: '#3F51B5' }}>
-            <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
-              <Button onClick={tentit} style={{ color: 'white' }}>Tentit</Button>
-              <Button onClick={TarkistaState} style={{ color: 'white' }}>Tarkista State</Button>
-              <Button onClick={vaihdaKäyttäjää} style={{ color: 'white' }}>{state.admin ? "Vaihda Normikäyttäjäksi" : "Vaihda Adminiksi"}</Button>
-              <Button onClick={Logout} style={{ color: 'white' }}>{"Kirjaudu Ulos"}</Button>
+      <div>
+        <div style={{ backgroundColor: '#3F51B5' }}>
+          <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
 
-
-
-            </div>
-          </div>
-
-          <div style={mainContainerStyle}>
             {isLoggedIn() ?
-
-              <div style={tableContainerStyle}>
-                {state.admin ?
-                  <VastausListaAdmin />
-                  :
-                  <VastausLista />
-                }
-
+              <div style={{ height: '100%', width: '100%', display: 'flex' }}>
+                <Button onClick={tentit} style={{ color: 'white' }}>Tentit</Button>
+                <Button onClick={TarkistaState} style={{ color: 'white' }}>Tarkista State</Button>
+                <Button name={"VaihdaKäyttäjääButton"} onClick={vaihdaKäyttäjää} style={{ color: 'white' }}>{state.admin ? "Vaihda Normikäyttäjäksi" : "Vaihda Adminiksi"}</Button>
+                <Button name={"LogoutButton"} onClick={Logout} style={{ color: 'white' }}>{"Kirjaudu Ulos"}</Button>
               </div>
               :
-              <Login />
+
+              []
             }
+
+
           </div>
         </div>
+
+        <div style={mainContainerStyle}>
+          {isLoggedIn() ?
+
+            <div style={tableContainerStyle}>
+              {state.admin ?
+                <VastausListaAdmin />
+                :
+                <VastausLista />
+              }
+
+            </div>
+            :
+            <Login />
+          }
+        </div>
+      </div>
     </UserContext.Provider>
 
   );

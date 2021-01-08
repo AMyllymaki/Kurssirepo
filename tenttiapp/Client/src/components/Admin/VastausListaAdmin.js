@@ -59,9 +59,13 @@ function VastausListaAdmin() {
             let tentti = uusiTentti()
             lisääTentti(tentti).then((response) => {
 
+
                 tentti.id = response
                 tmpTentit.push(tentti)
+                lisääTenttiTestaustaVarten(tentti.id)
                 dispatch({ type: "MuutaTenttejä", payload: tmpTentit })
+
+
 
             }).catch((error) => {
                 console.log(error)
@@ -215,7 +219,7 @@ function VastausListaAdmin() {
 
             poistaVastausVaihtoehto(vastausVaihtoehtoID).then((response) => {
 
-                PoistettavanKysymys.vastausVaihtoehdot =  PoistettavanKysymys.vastausVaihtoehdot.filter(vastausvaihtoehto => vastausvaihtoehto.id !== vastausVaihtoehtoID)
+                PoistettavanKysymys.vastausVaihtoehdot = PoistettavanKysymys.vastausVaihtoehdot.filter(vastausvaihtoehto => vastausvaihtoehto.id !== vastausVaihtoehtoID)
                 dispatch({ type: "MuutaTenttejä", payload: tmpTentit })
 
             }).catch((error) => {
@@ -276,6 +280,39 @@ function VastausListaAdmin() {
         muutaKomponenttia(e.target.value, tentti.id)
     }
 
+    //Lisää staten listaan objektin jossa on tässä sessiossa luodun tentin ID ja tenttiä vastaavan UI komponentin nimi
+    const lisääTenttiTestaustaVarten = (tenttiID) => {
+        let tmpTestausTentit = [...state.testausTentit]
+
+        let pituus = tmpTestausTentit.length
+
+        let tmpTentti =
+        {
+            id: tenttiID,
+            nimi: "uusiTentti" + (pituus + 1)
+        }
+
+        tmpTestausTentit.push(tmpTentti)
+
+        dispatch({ type: "LisääTestausTentti", payload: tmpTestausTentit })
+    }
+
+    //Testausta varten
+    const haeTenttiKomponentinNimi = (tentinNimi, i) => {
+
+        if (tentinNimi === "Tentin nimi") {
+            return "tyhjä_tentti"
+        }
+
+        let paluuarvo = "tentti" + i
+
+        return paluuarvo
+    }
+
+
+
+  
+
     let valittuTentti = haeIDllä(state.valittuTenttiIndex, state.tentit)
 
     return (<div style={{ width: '100%' }}>
@@ -285,7 +322,7 @@ function VastausListaAdmin() {
                 <div key={i} style={{ display: 'flex', flexDirection: 'row' }} >
                     <div onClick={() => valitseTentti(tentti)}>
                         <TextField
-
+                            name={haeTenttiKomponentinNimi(tentti.nimi, i)}
                             color={tentti.id === checkValittuTentti(state.valittuTenttiIndex) ? "primary" : "secondary"}
                             fullWidth
                             label={tentti.nimi}
@@ -298,7 +335,7 @@ function VastausListaAdmin() {
                 </div>
             )}
 
-            <IconButton onClick={() => lisääKomponentti()} >
+            <IconButton name={"LisääTenttiButton"} onClick={() => lisääKomponentti()} >
                 <AddCircleRoundedIcon />
             </IconButton>
 
@@ -311,7 +348,7 @@ function VastausListaAdmin() {
                 </div>
                 :
                 valittuTentti !== undefined && valittuTentti.kysymykset && <div style={{ width: '100%' }}>
-                    {valittuTentti.kysymykset.map(kysymys =>
+                    {valittuTentti.kysymykset.map((kysymys,i) =>
                         <KysymysMuokattava
                             key={kysymys.id}
                             tenttiID={valittuTentti.id}
@@ -319,11 +356,12 @@ function VastausListaAdmin() {
                             handleInputChange={muutaKomponenttia}
                             handleDelete={poistaKomponentti}
                             handleAdding={lisääKomponentti}
-                            kysymys={kysymys} />
+                            kysymys={kysymys}
+                            kysymysnro={i} />
                     )}
 
                     <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 15 }}>
-                        <IconButton onClick={() => lisääKomponentti(valittuTentti.id)} >
+                        <IconButton name={"LisääKysymysButton"} onClick={() => lisääKomponentti(valittuTentti.id)} >
                             <AddCircleRoundedIcon />
                         </IconButton>
                     </div>

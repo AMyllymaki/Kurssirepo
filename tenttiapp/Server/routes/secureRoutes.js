@@ -81,7 +81,7 @@ router.post('/loginToken', function (req, res) {
 
     //Hae kaikki tentit
     router.get('/tentti/', (req, res) => {
-        db.query('SELECT * FROM tentti', (err, result) => {
+        db.query('SELECT * FROM tentti ORDER BY id', (err, result) => {
 
 
             if (err) {
@@ -216,73 +216,7 @@ router.post('/loginToken', function (req, res) {
     })
 }
 
-{//Kysymys queryt
-    router.delete('/kysymys/:id',CheckIfAdmin, (req, res) => {
-        db.query('DELETE FROM kysymys WHERE id = $1', [req.params.id], (err, result) => {
 
-            console.log(req.params.id)
-            if (err) {
-                console.log(err)
-            }
-            res.send(result)
-        })
-    })
-
-    router.get('/kysymys/:id', (req, res) => {
-        db.query('SELECT * FROM kysymys WHERE id = $1', [req.params.id], (err, result) => {
-
-            console.log(req.params.id)
-            if (err) {
-                console.log(err)
-            }
-            res.send(result.rows[0])
-        })
-    })
-
-    router.get('/kysymys/', (req, res) => {
-        db.query('SELECT * FROM kysymys', (err, result) => {
-
-            if (err) {
-                console.log(err)
-            }
-            res.send(result.rows)
-        })
-    })
-
-    router.post('/kysymys/', CheckIfAdmin, (req, res) => {
-
-        let kysymys = req.body.kysymys
-        let aihe_id = req.body.aihe_id
-        let SQLRequest = "INSERT INTO kysymys(kysymys, aihe_id) VALUES ($1, $2) RETURNING id"
-
-        db.query(SQLRequest, [kysymys, aihe_id], (err, result) => {
-
-            console.log(req.params.id)
-            if (err) {
-                console.log(err)
-                return
-            }
-            res.send(result.rows[0].id)
-        })
-    })
-
-    router.put('/kysymys/:id', (req, res) => {
-
-        let kysymys = req.body.kysymys
-        let aihe_id = req.body.aihe_id
-        let SQLRequest = "UPDATE kysymys SET kysymys=$1, aihe_id=$2 WHERE id=$3"
-
-        db.query(SQLRequest, [kysymys, aihe_id, req.params.id], (err, result) => {
-
-            console.log(req.params.id)
-            if (err) {
-                console.log(err)
-                return
-            }
-            res.send(result.rows[0])
-        })
-    })
-}
 
 
 module.exports = router;

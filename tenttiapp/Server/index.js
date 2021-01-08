@@ -328,6 +328,74 @@ const db = require('./db');
 }
 
 
+{//Kysymys queryt
+    app.delete('/kysymys/:id', (req, res) => {
+        db.query('DELETE FROM kysymys WHERE id = $1', [req.params.id], (err, result) => {
+
+            console.log(req.params.id)
+            if (err) {
+                console.log(err)
+            }
+            res.send(result)
+        })
+    })
+
+    app.get('/kysymys/:id', (req, res) => {
+        db.query('SELECT * FROM kysymys WHERE id = $1', [req.params.id], (err, result) => {
+
+            console.log(req.params.id)
+            if (err) {
+                console.log(err)
+            }
+            res.send(result.rows[0])
+        })
+    })
+
+    app.get('/kysymys/', (req, res) => {
+        db.query('SELECT * FROM kysymys', (err, result) => {
+
+            if (err) {
+                console.log(err)
+            }
+            res.send(result.rows)
+        })
+    })
+
+    app.post('/kysymys/', (req, res) => {
+
+        let kysymys = req.body.kysymys
+        let aihe_id = req.body.aihe_id
+        let SQLRequest = "INSERT INTO kysymys(kysymys, aihe_id) VALUES ($1, $2) RETURNING id"
+
+        db.query(SQLRequest, [kysymys, aihe_id], (err, result) => {
+
+            console.log(req.params.id)
+            if (err) {
+                console.log(err)
+                return
+            }
+            res.send(result.rows[0].id)
+        })
+    })
+
+    app.put('/kysymys/:id', (req, res) => {
+
+        let kysymys = req.body.kysymys
+        let aihe_id = req.body.aihe_id
+        let SQLRequest = "UPDATE kysymys SET kysymys=$1, aihe_id=$2 WHERE id=$3"
+
+        db.query(SQLRequest, [kysymys, aihe_id, req.params.id], (err, result) => {
+
+            console.log(req.params.id)
+            if (err) {
+                console.log(err)
+                return
+            }
+            res.send(result.rows[0])
+        })
+    })
+}
+
 
 app.listen(port, () => {
     console.log(`Example app listening at http://localhost:${port}`)
