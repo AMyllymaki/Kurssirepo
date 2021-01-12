@@ -12,11 +12,12 @@ LoginWithUsernameAndPassword ${Username} ${Password}
 *** Keywords ***
 Create Exams From Excel
     [Arguments]                   ${Username}     ${Password}    
+    Set Selenium speed    1s
     Open Browser                  ${URL}          ${BROWSER}
     Maximize Browser Window
     Input Username                ${Username}
     Input Password                ${Password}
     Submit Credentials
-    Sleep                         3s
+    Sleep                         4s
     Page Should Contain Button    LogoutButton
     

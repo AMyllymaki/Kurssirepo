@@ -14,7 +14,7 @@ Create Exams From Excel ${TentinNimi}    ${Kysymysnimi}    ${VastausvaihtoehtoNi
 Create Exams From Excel
     [Arguments]    ${TentinNimi}    ${Kysymysnimi}    ${VastausvaihtoehtoNimi}
 
-    Set Selenium speed    0.2s
+    Set Selenium speed    1s
     Add Exam
     Select Exam
     Add Question

@@ -1,0 +1,11 @@
+{
+   
+    "app.vaihda-kieli-button": "Change Language",
+    "app.tentit-button": "Exams",
+    "app.tarkista-state-button": "Check State",
+    "app.vaihda-normikäyttäjäksi-button": "Change to Normal User",
+    "app.vaihda-adminiksi-button": "Change to Admin",
+    "app.kirjaudu-ulos-button": "Log out"
+
+    
+}

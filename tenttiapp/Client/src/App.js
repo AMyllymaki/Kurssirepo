@@ -7,9 +7,8 @@ import { haeTentit } from "./components/HttpRequests/tenttiRequests.js"
 import Login from "./components/LoginPage/Login.js"
 import { loginToken } from "./components/HttpRequests/loginRequests.js"
 import { LoginSuccess } from './components/SweetAlerts.js'
-
-
-
+import { FormattedMessage } from 'react-intl';
+import messages from './messages';
 
 const mainContainerStyle =
 {
@@ -123,7 +122,7 @@ const reducer = (state = initialState, action) => {
 }
 
 
-function App() {
+function App(props) {
 
   const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -234,6 +233,12 @@ function App() {
 
   const tentit = () => {
 
+
+  }
+
+  const vaihdaKieli = () => {
+
+    props.vaihdaKieli()
   }
 
   const isLoggedIn = () => {
@@ -250,13 +255,32 @@ function App() {
       <div>
         <div style={{ backgroundColor: '#3F51B5' }}>
           <div style={{ height: 64, width: '100%', display: 'flex', alignItems: 'center', paddingLeft: 24 }}>
+            <div style={{ height: '100%', width: 200, display: 'flex' }}>
 
+              <Button onClick={vaihdaKieli} style={{ color: 'white' }}>
+                <FormattedMessage {...messages.btnVaihdaKieli} />
+              </Button>
+            </div>
             {isLoggedIn() ?
               <div style={{ height: '100%', width: '100%', display: 'flex' }}>
-                <Button onClick={tentit} style={{ color: 'white' }}>Tentit</Button>
-                <Button onClick={TarkistaState} style={{ color: 'white' }}>Tarkista State</Button>
-                <Button name={"VaihdaKäyttäjääButton"} onClick={vaihdaKäyttäjää} style={{ color: 'white' }}>{state.admin ? "Vaihda Normikäyttäjäksi" : "Vaihda Adminiksi"}</Button>
-                <Button name={"LogoutButton"} onClick={Logout} style={{ color: 'white' }}>{"Kirjaudu Ulos"}</Button>
+
+                <Button onClick={tentit} style={{ color: 'white' }}>
+                  <FormattedMessage {...messages.btnTentti} />
+                </Button>
+                <Button onClick={TarkistaState} style={{ color: 'white' }}>
+                  <FormattedMessage {...messages.btnTarkistaState} />
+                </Button>
+                <Button name={"VaihdaKäyttäjääButton"} onClick={vaihdaKäyttäjää} style={{ color: 'white' }}>
+
+                  {state.admin ?
+                    <FormattedMessage {...messages.btnVaihdaNormikäyttäjäksi} />
+                    :
+                    <FormattedMessage {...messages.btnVaihdaAdminiksi} />
+                  }
+                </Button>
+                <Button name={"LogoutButton"} onClick={Logout} style={{ color: 'white' }}>
+                  <FormattedMessage {...messages.btnKirjauduUlos} />
+                </Button>
               </div>
               :
 
