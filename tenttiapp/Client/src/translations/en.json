@@ -5,7 +5,20 @@
     "app.tarkista-state-button": "Check State",
     "app.vaihda-normikäyttäjäksi-button": "Change to Normal User",
     "app.vaihda-adminiksi-button": "Change to Admin",
-    "app.kirjaudu-ulos-button": "Log out"
+    "app.kirjaudu-ulos-button": "Log out",
+    "app.kirjautuminen-title": "Login",
+    "app.tilinluonti-title": "Account Creation",
 
-    
+    "app.uusi-tili-button": "New Account",
+    "app.kirjaudu-button": "Login",
+    "app.luo-tili-button": "Create Account",
+    "app.takaisin-kirjautumiseen-button": "Back to Login",
+    "app.käyttäjätunnus-placeholder": "Username",
+    "app.salasana-placeholder": "Password",
+    "app.salasana-uudelleen-placeholder": "Password Again",
+
+    "app.näytä-vastaukset-button": "Show Answers",
+    "app.piilota-vastaukset-button": "Hide Answers",
+    "app.näytä-graafi-button": "Show Graph"
+
 }

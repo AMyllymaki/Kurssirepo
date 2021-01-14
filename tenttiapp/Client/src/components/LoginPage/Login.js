@@ -7,6 +7,9 @@ import { loginUsername } from '../HttpRequests/loginRequests.js'
 import { registerUser } from '../HttpRequests/registerRequests.js'
 import Swal from 'sweetalert2'
 import { LoginSuccess } from '../SweetAlerts.js'
+import messages from '../../messages';
+import { FormattedMessage } from 'react-intl';
+import StoryButton from '../StorybookComponents'
 
 
 
@@ -139,7 +142,7 @@ function Login() {
 
         {isLogin ?
             <div style={{ display: "flex", flexDirection: 'column', width: '50%', justifyContent: 'space-between' }}>
-                <h1>Kirjautuminen</h1>
+                <h1>  <FormattedMessage {...messages.titleKirjautuminen} /></h1>
 
                 <TextField
 
@@ -148,7 +151,7 @@ function Login() {
                     style={{ height: 65 }}
                     text={username}
                     variant="outlined"
-                    label="Käyttäjätunnus"
+                    label={<FormattedMessage {...messages.PlaceholderKäyttäjätunnus} />}
                     onChange={(e) => setUsername(e.target.value)} />
 
 
@@ -159,19 +162,19 @@ function Login() {
                     text={password}
                     variant="outlined"
                     type="password"
-                    label="Salasana"
+                    label={<FormattedMessage {...messages.PlaceholderSalasana} />}
                     onChange={(e) => setPassword(e.target.value)} />
 
 
             </div>
             :
             <div style={{ display: "flex", flexDirection: 'column', width: '50%' }}>
-                <h1>Tilin luonti</h1>
+                <h1> <FormattedMessage {...messages.titleTilinluonti} /></h1>
 
                 <TextField
 
                     style={{ height: 65 }}
-                    label={"Käyttäjätunnus"}
+                    label={<FormattedMessage {...messages.PlaceholderKäyttäjätunnus} />}
                     text={username}
                     variant="outlined"
                     onChange={(e) => setUsername(e.target.value)} />
@@ -181,7 +184,7 @@ function Login() {
                 <TextField
 
                     style={{ height: 65 }}
-                    label={"Salasana"}
+                    label={<FormattedMessage {...messages.PlaceholderSalasana} />}
                     text={password}
                     type="password"
                     variant="outlined"
@@ -190,7 +193,7 @@ function Login() {
                 <TextField
 
                     style={{ height: 65 }}
-                    label={"Salasana uudestaan"}
+                    label={<FormattedMessage {...messages.PlaceholderSalasanaUudestaan} />}
                     text={passwordAgain}
                     type="password"
                     variant="outlined"
@@ -202,13 +205,14 @@ function Login() {
 
         }
         <div style={{ display: "flex", flexDirection: "row", width: '50%', paddingTop: 30, justifyContent: 'flex-end' }}>
-            <Button style={{ marginRight: 5 }} color="primary" variant="contained" onClick={changeLoginType}>{isLogin ? "Uusi tili" : "Takaisin kirjautumiseen"}</Button>
+            <StoryButton style={{ marginRight: 5 }} color="primary" variant="contained" onClick={changeLoginType}>{isLogin ? <FormattedMessage {...messages.btnUusiTili} /> : <FormattedMessage {...messages.btnTakaisinKirjautumiseen} />}</StoryButton>
             {isLogin ?
-                <Button name="login_button" color="primary" variant="contained" onClick={LoginWithUsername}>Kirjaudu</Button>
+                <StoryButton name="login_button" color="primary" variant="contained" onClick={LoginWithUsername}><FormattedMessage {...messages.btnKirjaudu} /></StoryButton>
                 :
-                <Button color="primary" variant="contained" onClick={RegisterUser}>Luo tili</Button>
+                <StoryButton color="primary" variant="contained" onClick={RegisterUser}><FormattedMessage {...messages.btnLuoTili} /></StoryButton>
             }
         </div>
+
     </div >)
 
 

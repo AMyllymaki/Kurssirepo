@@ -13,6 +13,8 @@ import { Radar } from 'react-chartjs-2'
 import { uusiKysymysKannasta } from '../ObjektiRakentajat/kysymysObjekti'
 import { haeTentinKysymykset } from "../HttpRequests/tenttiKysymysRequests.js"
 import { lisääVastaus, haeKäyttäjänVastauksetTenttiin, muokkaaVastausta } from "../HttpRequests/vastausRequests.js"
+import messages from '../../messages';
+import { FormattedMessage } from 'react-intl';
 
 
 function VastausLista() {
@@ -371,14 +373,14 @@ function VastausLista() {
 
                         <Button color="primary" variant="contained" onClick={muutaNäytävastaukset}>
                             {state.näytäVastaukset ?
-                                "Piilota Vastaukset"
+                              <FormattedMessage {...messages.btnPiilotaVastaukset} />
                                 :
-                                "Näytä vastaukset"
+                                <FormattedMessage {...messages.btnNäytävastaukset} />
                             }
                         </Button>
 
                         {state.näytäVastaukset &&
-                            <Button color="primary" variant="contained" onClick={muutaNäytäGraafi}>Näytä Graafi</Button>
+                            <Button color="primary" variant="contained" onClick={muutaNäytäGraafi}>   <FormattedMessage {...messages.btnNäytäGraafi} /></Button>
                         }
 
                     </div>
