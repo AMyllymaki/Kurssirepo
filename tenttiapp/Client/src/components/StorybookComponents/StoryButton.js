@@ -7,7 +7,7 @@ function StoryButton (props)
 
     return(
 
-        <Button className={`Button ${color}`} color={color} variant='contained'{...rest}>
+        <Button className={`StoryButton`} color={color} variant='contained'{...rest}>
             {children}
         </Button>
     )

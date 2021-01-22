@@ -20,7 +20,7 @@ const CheckIfAdmin = (req, res, next) =>
 router.post('/loginToken', function (req, res) {
 
     let User
-    console.log("here")
+  
 
     if (req.user) {
         let tmpUser = req.user
@@ -54,7 +54,7 @@ router.post('/loginToken', function (req, res) {
     router.get('/kayttaja/', CheckIfAdmin, (req, res) => {
         db.query('SELECT * FROM käyttäjä', (err, result) => {
 
-            console.log("haetaan kayttajat")
+          
 
             if (err) {
                 console.log(err)
@@ -71,7 +71,7 @@ router.post('/loginToken', function (req, res) {
     router.get('/tentti/:id', (req, res) => {
         db.query('SELECT * FROM tentti WHERE id = $1', [req.params.id], (err, result) => {
 
-            console.log(req.params.id)
+        
             if (err) {
                 console.log(err)
             }
@@ -182,7 +182,7 @@ router.post('/loginToken', function (req, res) {
     //Lisää kysymys tenttiin
     router.post('/tenttikysymys/',CheckIfAdmin, (req, res) => {
 
-        console.log(req.body)
+      
 
         let tentti_id = req.body.tentti_id
         let kysymys_id = req.body.kysymys_id
@@ -191,7 +191,7 @@ router.post('/loginToken', function (req, res) {
 
         db.query(SQLRequest, [tentti_id, kysymys_id], (err, result) => {
 
-            console.log(req.params.id)
+         
             if (err) {
                 console.log(err)
                 return

@@ -1,6 +1,6 @@
 
 import { UserContext } from '../../App.js'
-import { useContext } from 'react';
+import { useContext} from 'react';
 
 import KysymysMuokattava from './KysymysMuokattava'
 import logo from '../../images/selmaSpin.gif'
@@ -21,7 +21,7 @@ import { lisääKysymysTenttiin, haeTentinKysymykset } from "../HttpRequests/ten
 function VastausListaAdmin() {
 
     const { state, dispatch } = useContext(UserContext)
-
+   
     const valitseTentti = (tentti) => {
 
         haeTentinKysymykset(tentti.id).then((kysymykset) => {
@@ -309,7 +309,7 @@ function VastausListaAdmin() {
         return paluuarvo
     }
 
-
+    
 
   
 
@@ -332,6 +332,8 @@ function VastausListaAdmin() {
                     <IconButton onClick={() => poistaKomponentti(tentti.id)}>
                         <DeleteIcon />
                     </IconButton>
+
+                    
                 </div>
             )}
 

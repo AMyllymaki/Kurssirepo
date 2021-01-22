@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Checkbox from '@material-ui/core/Checkbox';
 import Paper from '@material-ui/core/Paper';
 
@@ -5,13 +6,19 @@ import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddCircleRoundedIcon from '@material-ui/icons/AddCircleRounded';
+import ImageIcon from '@material-ui/icons/Image';
+import Dropzone from '../Dropzone'
+
 
 //This is from material-ui documentation
 
 function KysymysMuokattava(props) {
 
+    const [addPicture, setAddPicture] = useState(false)
+    const [picture, setPicture] = useState(undefined)
 
     const { kysymys, vastausVaihtoehdot, oikeatVastaukset } = props.kysymys
+
 
     const checkboxClicked = (e, i) => {
         props.handleInputChange(e.target.checked, props.tenttiID, props.kysymysID, i, true)
@@ -40,9 +47,9 @@ function KysymysMuokattava(props) {
     //Testausta varten
     const haeKysymysKomponentinNimi = (kysymysNimi, i) => {
 
-      
+
         if (kysymysNimi === "Kysymyksen kuvaus" || kysymysNimi === undefined) {
-        
+
             return "tyhjä_kysymys"
         }
 
@@ -64,6 +71,12 @@ function KysymysMuokattava(props) {
         return paluuarvo
     }
 
+    const getPictureFromDropzone = (picture) => {
+
+        console.log(picture)
+        setPicture(picture)
+    }
+
     return (
 
         <Paper style={{ width: '100%', padding: 15 }}>
@@ -78,10 +91,24 @@ function KysymysMuokattava(props) {
                         variant="outlined"
                         onChange={(e) => muutaKysymyksenKuvaus(e)} />
 
-                    <IconButton onClick={() => PoistaKysymys()}>
-                        <DeleteIcon />
-                    </IconButton>
+                    <div style={{ display: 'flex', width: '100%', minHeight: 75, maxHeight: 200, paddingTop: 10,  paddingBottom: 10,  alignItems: 'center' }}>
+                        <IconButton onClick={() => PoistaKysymys()}>
+                            <DeleteIcon />
+                        </IconButton>
 
+                        {addPicture ?
+                            picture ?
+                                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center' }}>
+                                    <img src={picture} width={150} height={150} />
+                                </div>
+                                :
+                                <Dropzone getPictureFromDropzone={getPictureFromDropzone} />
+                            :
+                            <IconButton onClick={() => setAddPicture(true)}>
+                                <ImageIcon />
+                            </IconButton>
+                        }
+                    </div>
                     {vastausVaihtoehdot.map((vastausVaihtoehto, i) =>
 
                         <div key={i} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>

@@ -8,11 +8,28 @@ const routes = require('./routes/routes.js');
 const secureRoutes = require('./routes/secureRoutes.js')
 
 const passport = require('passport');
+const multer = require('multer');
+
+const WebSocket = require('ws');
+
+const wss = new WebSocket.Server({ port: 2356 });
 
 const app = express()
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './upload');
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+
+
+const upload = multer({ storage: storage });
 
 
 app.use(cors())
@@ -25,6 +42,38 @@ app.use('/authenticated', passport.authenticate('loginToken', { session: false }
 // notice here I'm requiring my database adapter file
 // and not requiring node-postgres directly
 const db = require('./db');
+
+var pg = require('pg');
+var con_string = 'tcp://postgres:admin@localhost/Tenttikanta';
+
+
+let pg_client = new pg.Client(con_string)
+pg_client.connect()
+pg_client.query('LISTEN inserttentti')
+pg_client.query('LISTEN insertkysymys')
+pg_client.query('LISTEN insertvastausvaihtoehto')
+pg_client.query('LISTEN deletetentti')
+pg_client.query('LISTEN deletekysymys')
+pg_client.query('LISTEN deletevastausvaihtoehto')
+
+
+
+
+wss.on('connection', function connection(ws) {
+
+    pg_client.on('notification', function (nimi) {
+
+        if(pg_client === ws)
+        {
+           
+        }
+
+        ws.send(nimi.payload);
+
+    })
+    console.log("Someone connected")
+})
+
 
 //TODO
 
@@ -64,7 +113,7 @@ const db = require('./db');
     app.get('/kurssi/', (req, res) => {
         db.query('SELECT * FROM kurssi', (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
             }
@@ -80,7 +129,7 @@ const db = require('./db');
 
         db.query(SQLRequest, [kurssi], (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
                 return
@@ -118,7 +167,7 @@ const db = require('./db');
     app.get('/aihe/', (req, res) => {
         db.query('SELECT * FROM aihe', (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
             }
@@ -133,7 +182,7 @@ const db = require('./db');
 
         db.query(SQLRequest, [aihe], (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
                 return
@@ -150,7 +199,7 @@ const db = require('./db');
 
         db.query(SQLRequest, [aihe, req.params.id], (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
                 return
@@ -184,7 +233,7 @@ const db = require('./db');
     app.get('/vastausvaihtoehto/', (req, res) => {
         db.query('SELECT * FROM vastausvaihtoehto ORDER BY id', (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
             }
@@ -195,7 +244,7 @@ const db = require('./db');
     app.get('/vastausvaihtoehto/kysymys/:id', (req, res) => {
         db.query('SELECT * FROM vastausvaihtoehto WHERE kysymys_id =$1 ORDER BY id', [req.params.id], (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
             }
@@ -213,7 +262,7 @@ const db = require('./db');
 
         db.query(SQLRequest, [vaihtoehto, oikea_vastaus, kysymys_id], (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
                 return
@@ -230,7 +279,7 @@ const db = require('./db');
 
         db.query(SQLRequest, [vaihtoehto, oikea_vastaus, req.params.id], (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
                 return
@@ -264,7 +313,7 @@ const db = require('./db');
     app.get('/vastaus/', (req, res) => {
         db.query('SELECT * FROM vastaus', (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
             }
@@ -298,7 +347,7 @@ const db = require('./db');
 
         db.query(SQLRequest, [tyyppi, vaihtoehto_id, käyttäjä_id], (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
                 return
@@ -313,11 +362,9 @@ const db = require('./db');
         let tyyppi = req.body.tyyppi
         let SQLRequest = "UPDATE vastaus SET tyyppi=$1, vastauspäivämäärä=now() WHERE id=$2"
 
-        console.log(tyyppi)
 
         db.query(SQLRequest, [tyyppi, req.params.id], (err, result) => {
 
-            console.log(req.params.id)
             if (err) {
                 console.log(err)
                 return
@@ -332,7 +379,7 @@ const db = require('./db');
     app.delete('/kysymys/:id', (req, res) => {
         db.query('DELETE FROM kysymys WHERE id = $1', [req.params.id], (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
             }
@@ -343,7 +390,6 @@ const db = require('./db');
     app.get('/kysymys/:id', (req, res) => {
         db.query('SELECT * FROM kysymys WHERE id = $1', [req.params.id], (err, result) => {
 
-            console.log(req.params.id)
             if (err) {
                 console.log(err)
             }
@@ -369,7 +415,7 @@ const db = require('./db');
 
         db.query(SQLRequest, [kysymys, aihe_id], (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
                 return
@@ -386,7 +432,7 @@ const db = require('./db');
 
         db.query(SQLRequest, [kysymys, aihe_id, req.params.id], (err, result) => {
 
-            console.log(req.params.id)
+
             if (err) {
                 console.log(err)
                 return
@@ -395,6 +441,26 @@ const db = require('./db');
         })
     })
 }
+
+
+
+app.post('/upload', upload.single("Test"), function (req, res, next) {
+
+
+
+    const file = req.file
+
+    if (!file) {
+        const error = new Error('Please upload a file')
+        error.httpStatusCode = 400
+        return next(error)
+    }
+    res.send(file)
+
+
+})
+
+
 
 
 app.listen(port, () => {

@@ -1,4 +1,4 @@
-import { useEffect, useReducer, createContext } from "react"
+import { useEffect, useReducer, createContext, useRef } from "react"
 import Button from '@material-ui/core/Button';
 
 import VastausLista from './components/NormalUser/VastausLista'
@@ -6,7 +6,7 @@ import VastausListaAdmin from './components/Admin/VastausListaAdmin'
 import { haeTentit } from "./components/HttpRequests/tenttiRequests.js"
 import Login from "./components/LoginPage/Login.js"
 import { loginToken } from "./components/HttpRequests/loginRequests.js"
-import { LoginSuccess } from './components/SweetAlerts.js'
+import { LoginSuccess, TriggerToast } from './components/SweetAlerts.js'
 import { FormattedMessage } from 'react-intl';
 import messages from './messages';
 
@@ -120,13 +120,37 @@ const reducer = (state = initialState, action) => {
 
   }
 }
-
+const URL = 'ws://localhost:2356'
 
 function App(props) {
 
   const [state, dispatch] = useReducer(reducer, initialState)
 
+  const ws = useRef(null)
+
   useEffect(() => {
+
+    ws.current = new WebSocket(URL)
+
+    ws.current.onopen = () => {
+      // on connecting, do nothing but log it to the console
+      console.log("connected")
+    }
+
+    ws.current.onmessage = evt => {
+      // on receiving a message, add it to the list of messages
+      console.log("Got Message")
+      console.log(evt.data)
+      TriggerToast(evt.data)
+  
+    }
+
+    ws.current.onclose = () => {
+      console.log('disconnected')
+      // automatically try to reconnect on connection loss
+      ws.current = new WebSocket(URL)
+    }
+
 
     LoginWithToken(localStorage.getItem('jwtToken'))
 
@@ -306,6 +330,8 @@ function App(props) {
             <Login />
           }
         </div>
+
+
       </div>
     </UserContext.Provider>
 
